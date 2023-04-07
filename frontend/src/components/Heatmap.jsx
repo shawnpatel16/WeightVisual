@@ -8,10 +8,16 @@ const Cal = () => {
   const cal = new CalHeatmap();
   cal.paint(
     {
-      range: 4,
+      range: 8,
       theme: "dark",
       domain: { type: "month", gutter: 10, dynamicDimension: false },
-      subDomain: { type: "xDay", label: "DD" },
+      subDomain: {
+        type: "xDay",
+        label: "DD",
+        width: 20,
+        height: 20,
+        color: "rgb(34 197 94)",
+      },
     },
     [[Tooltip]]
   );
@@ -42,7 +48,7 @@ const Cal = () => {
 
 const Heatmap = () => {
   return (
-    <div>
+    <div className="mx-4">
       Heatmap
       <Cal />
     </div>
