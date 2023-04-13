@@ -1,28 +1,44 @@
 const Workout = require("../models/workoutModel");
-const Exercise = require("../models/exerciseModel")
+const Exercise = require("../models/exerciseModel");
 const mongoose = require("mongoose");
-const asyncHandler = require('express-async-handler');
-const moment = require('moment')
+const asyncHandler = require("express-async-handler");
+const moment = require("moment");
 //@desc: Get workout information for homepage
 //@route: /
-const getWorkoutsSummary = asyncHandler(async(req,res) => {
-    const totalWorkouts = await Workout.countDocuments({})
-    const oldestWorkout = await Workout.findOne().sort({ createdAt: 1 }).limit(1);
-    const oldestWorkoutDate = oldestWorkout.createdAt;
-    const currentDate = new Date();
-    const duration = moment.duration(moment(currentDate).diff(moment(oldestWorkoutDate)))
-    const weeksPassed = Math.floor(duration.asWeeks());
-    const weeklyAverage = weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const workouts = await Workout.find().sort({ date: -1 }).skip((page - 1) * limit).limit(limit);
-    res.status(200).json({totalWorkouts, weeklyAverage, workouts})
-})
-
+//@inputs: get current page number to see which exercises need to be displayed
+//@return: total number of workouts, weekly average number of workouts, and 10 workouts per page
+const getWorkoutsSummary = asyncHandler(async (req, res) => {
+  const totalWorkouts = await Workout.countDocuments({});
+  const oldestWorkout = await Workout.findOne().sort({ createdAt: 1 }).limit(1);
+  const oldestWorkoutDate = oldestWorkout.createdAt;
+  const currentDate = new Date();
+  const duration = moment.duration(
+    moment(currentDate).diff(moment(oldestWorkoutDate))
+  );
+  const weeksPassed = Math.floor(duration.asWeeks());
+  const weeklyAverage =
+    weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const workouts = await Workout.find()
+    .sort({ date: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+  res.status(200).json({ totalWorkouts, weeklyAverage, workouts });
+});
+//@desc: get all workouts
+//@route: /calendar
+//@input: None
+//@output: return the split name,date, id of all workouts
 const getAllWorkouts = asyncHandler(async (req, res) => {
-    const workouts = await Workout.find({}, 'split date _id').exec();
-    res.status(200).json(workouts)
- });
+  const workouts = await Workout.find({}, "split date _id").exec();
+  res.status(200).json(workouts);
+});
+
+//@desc: get all individual exerices or filtered exercises (not workouts but rather each individual exercise)
+//@route: /personal-bests
+//@input: search input
+//@output: all exercises or filtered exercises
 
 const getPersonalBests = asyncHandler(async (req, res) => {
   const exercises = await Exercise.find({});
@@ -38,17 +54,82 @@ const getPersonalBests = asyncHandler(async (req, res) => {
   }
 });
 
-
+//@desc: CRUD for each individual workout
+//@route: /
+//@input: req.params.id/req.body input form fields
+//@output: individual workouts
 const getWorkout = asyncHandler(async (req, res) => {
   const workout = await Workout.findById(req.params.id);
   res.status(200).json(workout);
 });
 
 const createWorkout = asyncHandler(async (req, res) => {
-  const workout = new Workout(req.body);
-  await workout.save();
-  res.status(201).json(workout);
+  const newWorkout = new Workout(req.body);
+  await newWorkout.save();
+  //iterate through each exercise to update exercise values
+  for (const exercise of newWorkout.exercises) {
+    //get the current information for the exercise
+    const existingExerciseRecord = await Exercise.findOne({
+      exerciseName: exercise.name,
+      "sets.date": newWorkout.date,
+    });
+    //if the exercise exists, then for the current entry's sets, calculate the highest volume to add it to the document
+    if (existingExerciseRecord) {
+      const entryHighestVolumeSet = exercise.sets.reduce(
+        (maxSet, currentSet) => {
+          const currentVolume = currentSet.weight * currentSet.reps;
+          const maxVolume = maxSet.weight * maxSet.reps;
+          return currentVolume > maxVolume ? currentSet : maxSet;
+        }
+      );
+
+      const newVolume =
+        entryHighestVolumeSet.weight * entryHighestVolumeSet.reps;
+      const existingVolume = existingExerciseRecord.highestVolume;
+
+      if (newVolume > existingVolume) {
+        //get the id of the existing exercise to update it
+        const filter = { _id: existingExerciseRecord._id };
+        //update both the highest volume attribute and the highest volume set
+        const update = {
+          $set: {
+            highestVolume: newVolume,
+            highestVolumeSet: entryHighestVolumeSet,
+          },
+          $addToSet: {
+            sets: {
+              weight: entryHighestVolumeSet.weight,
+              reps: entryHighestVolumeSet.reps,
+              volume: newVolume,
+              date: newWorkout.date,
+            }
+          }
+        };
+        const options = { new: true };
+        const updatedExerciseRecord = await Exercise.findOneAndUpdate(
+          filter,
+          update,
+          options
+        );
+      } else {
+        const filter = { _id: existingExerciseRecord._id };
+        const update = {
+          $addToSet: {
+            sets: {
+              weight: entryHighestVolumeSet.weight,
+              reps: entryHighestVolumeSet.reps,
+              volume: newVolume,
+              date: newWorkout.date,
+            },
+          },
+        };
+        await Exercise.findOneAndUpdate(filter,update)
+      }
+    }
+  }
+  res.status(201).json(newWorkout);
 });
+
 const updateWorkout = asyncHandler(async (req, res) => {
   const workout = await Workout.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -69,5 +150,5 @@ module.exports = {
   getWorkout,
   createWorkout,
   deleteWorkout,
-  updateWorkout
-}
+  updateWorkout,
+};
