@@ -5,7 +5,7 @@ const router = express.Router();
 router.get("/", getWorkoutsSummary)
 router.get("/calendar", getAllWorkouts)
 router.get("/personal-bests", getPersonalBests)
-router.put("/progress", getProgress);
+
 
 //getting individual workout data
 router.get("/:id", getWorkout);

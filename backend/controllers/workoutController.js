@@ -1,4 +1,5 @@
 const Workout = require("../models/workoutModel");
+const Exercise = require("../models/exerciseModel")
 const mongoose = require("mongoose");
 const asyncHandler = require('express-async-handler');
 const moment = require('moment')
@@ -23,14 +24,50 @@ const getAllWorkouts = asyncHandler(async (req, res) => {
     res.status(200).json(workouts)
  });
 
-const getPersonalBests = asyncHandler(async (req, res) => { });
+const getPersonalBests = asyncHandler(async (req, res) => {
+  const exercises = await Exercise.find({});
 
-const getProgress = asyncHandler(async (req, res) => { });
+  if (req.query.search) {
+    const searchQuery = req.query.search;
+    const filteredExercises = exercises.filter((exercise) =>
+      exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    res.status(200).json(filteredExercises);
+  } else {
+    res.status(200).json(exercises);
+  }
+});
 
-const getWorkout = asyncHandler(async (req, res) => { });
 
-const createWorkout = asyncHandler(async (req, res) => { });
+const getWorkout = asyncHandler(async (req, res) => {
+  const workout = await Workout.findById(req.params.id);
+  res.status(200).json(workout);
+});
 
-const updateWorkout = asyncHandler(async (req, res) => { });
+const createWorkout = asyncHandler(async (req, res) => {
+  const workout = new Workout(req.body);
+  await workout.save();
+  res.status(201).json(workout);
+});
+const updateWorkout = asyncHandler(async (req, res) => {
+  const workout = await Workout.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json(workout);
+});
 
-const deleteWorkout = asyncHandler(async (req, res) => {});
+const deleteWorkout = asyncHandler(async (req, res) => {
+  await Workout.findByIdAndDelete(req.params.id);
+  res.status(200).json({ message: "Workout deleted" });
+});
+
+module.exports = {
+  getWorkoutsSummary,
+  getAllWorkouts,
+  getPersonalBests,
+  getWorkout,
+  createWorkout,
+  deleteWorkout,
+  updateWorkout
+}
