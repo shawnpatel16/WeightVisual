@@ -10,14 +10,17 @@ const moment = require("moment");
 const getWorkoutsSummary = asyncHandler(async (req, res) => {
   const totalWorkouts = await Workout.countDocuments({});
   const oldestWorkout = await Workout.findOne().sort({ createdAt: 1 }).limit(1);
-  const oldestWorkoutDate = oldestWorkout.createdAt;
   const currentDate = new Date();
-  const duration = moment.duration(
-    moment(currentDate).diff(moment(oldestWorkoutDate))
-  );
-  const weeksPassed = Math.floor(duration.asWeeks());
-  const weeklyAverage =
-    weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
+  let weeklyAverage = totalWorkouts;
+  if (oldestWorkout) {
+    const oldestWorkoutDate = oldestWorkout.createdAt;
+    const duration = moment.duration(
+      moment(currentDate).diff(moment(oldestWorkoutDate))
+    );
+    const weeksPassed = Math.floor(duration.asWeeks());
+    const weeklyAverage =
+      weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
+  }
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const workouts = await Workout.find()
@@ -131,15 +134,120 @@ const createWorkout = asyncHandler(async (req, res) => {
 });
 
 const updateWorkout = asyncHandler(async (req, res) => {
-  const workout = await Workout.findByIdAndUpdate(req.params.id, req.body, {
+  const updatedWorkout = await Workout.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  res.status(200).json(workout);
+  for (const exercise of updatedWorkout.exercises) {
+    //get the current information for the exercise
+    const existingExerciseRecord = await Exercise.findOne({
+      exerciseName: exercise.name,
+      "sets.date": updatedWorkout.date,
+    });
+    //if the exercise exists, then for the current entry's sets, calculate the highest volume to add it to the document
+    if (existingExerciseRecord) {
+      const entryHighestVolumeSet = exercise.sets.reduce(
+        (maxSet, currentSet) => {
+          const currentVolume = currentSet.weight * currentSet.reps;
+          const maxVolume = maxSet.weight * maxSet.reps;
+          return currentVolume > maxVolume ? currentSet : maxSet;
+        }
+      );
+
+      const newVolume =
+        entryHighestVolumeSet.weight * entryHighestVolumeSet.reps;
+      const existingVolume = existingExerciseRecord.highestVolume;
+
+      if (newVolume > existingVolume) {
+        //get the id of the existing exercise to update it
+        const filter = { _id: existingExerciseRecord._id };
+        //update both the highest volume attribute and the highest volume set
+        const update = {
+          $set: {
+            highestVolume: newVolume,
+            highestVolumeSet: entryHighestVolumeSet,
+          },
+          $addToSet: {
+            sets: {
+              weight: entryHighestVolumeSet.weight,
+              reps: entryHighestVolumeSet.reps,
+              volume: newVolume,
+              date: updatedWorkout.date,
+            },
+          },
+        };
+        const options = { new: true };
+        const updatedExerciseRecord = await Exercise.findOneAndUpdate(
+          filter,
+          update,
+          options
+        );
+      } else {
+        const filter = { _id: existingExerciseRecord._id };
+        const update = {
+          $addToSet: {
+            sets: {
+              weight: entryHighestVolumeSet.weight,
+              reps: entryHighestVolumeSet.reps,
+              volume: newVolume,
+              date: updatedWorkout.date,
+            },
+          },
+        };
+        await Exercise.findOneAndUpdate(filter, update);
+      }
+    }
+  }
+   if (!updatedWorkout) {
+     res.status(404);
+     throw new Error("Workout not found");
+   }
+  res.status(200).json(updatedWorkout);
 });
 
 const deleteWorkout = asyncHandler(async (req, res) => {
-  await Workout.findByIdAndDelete(req.params.id);
+  const workoutToDelete = await Workout.findById(req.params.id);
+  if (!workoutToDelete) {
+    res.status(404);
+    throw new Error("Workout not found");
+  }
+
+  for (const exercise of workoutToDelete.exercises) { 
+    const exerciseRecord = await Exercise.findOne({
+      exerciseName: exercise.name,
+    });
+    if (exerciseRecord) {
+      exerciseRecord.sets = exerciseRecord.sets.filter(
+        (set) => set.date.getTime() !== workoutToDelete.date.getTime()
+      );
+      const highestVolumeSet = exerciseRecord.sets.reduce(
+        (maxSet, currentSet) => {
+          // Exclude the set with the matching date
+          if (currentSet.date.getTime() === workoutToDelete.date.getTime()) {
+            return maxSet;
+          }
+
+          const currentVolume = currentSet.weight * currentSet.reps;
+          const maxVolume = maxSet.weight * maxSet.reps;
+          return currentVolume > maxVolume ? currentSet : maxSet;
+        }
+      );
+    const filter = { _id: exerciseRecord._id };
+      const newHighestVolume = highestVolumeSet.weight * highestVolumeSet.reps;
+      
+      const update = {
+        $set: {
+          highestVolume: newHighestVolume,
+          highestVolumeSet: highestVolumeSet,
+        },
+      };
+
+      const options = { new: true };
+      await Exercise.findOneAndUpdate(filter, update, options);
+    }
+
+  }
+  await workoutToDelete.remove();
   res.status(200).json({ message: "Workout deleted" });
 });
 
