@@ -129,18 +129,25 @@ const createWorkout = asyncHandler(async (req, res) => {
         await Exercise.findOneAndUpdate(filter,update)
       }
     } else {
-      const newExercise = new Exercise({
-        exerciseName: exercise.name,
-        sets: exercise.sets
-      })
-      const highestVolumeSet = exercise.sets.reduce((maxSet, currentSet) => {
+      const newhighestVolumeSet = exercise.sets.reduce((maxSet, currentSet) => {
         const currentVolume = currentSet.weight * currentSet.reps;
         const maxVolume = maxSet.weight * maxSet.reps;
         return currentVolume > maxVolume ? currentSet : maxSet;
       });
-      newExercise.highestVolumeSet = highestVolumeSet;
-      newExercise.highestVolume =
-        highestVolumeSet.weight * highestVolumeSet.reps;
+      const newExercise = new Exercise({
+        exerciseName: exercise.name,
+        sets: exercise.sets.map(set => ({
+          ...set,
+          date: newWorkout.date
+        })),
+        highestVolume: newhighestVolumeSet.weight * newhighestVolumeSet.reps,
+        highestVolumeSet: {
+          ...newhighestVolumeSet,
+          date:newWorkout.date
+        }
+      })
+      
+      
 
       // Save the new Exercise document
       await newExercise.save();
@@ -181,7 +188,10 @@ const updateWorkout = asyncHandler(async (req, res) => {
         const update = {
           $set: {
             highestVolume: newVolume,
-            highestVolumeSet: entryHighestVolumeSet,
+            "highestVolumeSet.weight":entryHighestVolumeSet.weight,
+            "highestVolumeSet.reps":entryHighestVolumeSet.reps,
+            "highestVolumeSet.volume":newVolume,
+            "highestVolumeSet.date":updatedWorkout.date
           },
           $addToSet: {
             sets: {

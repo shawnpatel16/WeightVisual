@@ -27,7 +27,7 @@ const exerciseSchema = new mongoose.Schema({
         date: Date
     },
     sets: [setSchema]
-})
+}, {timestamps:true})
 
 const Exercise = mongoose.model("Exercise", exerciseSchema);
 module.exports = Exercise;

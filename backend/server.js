@@ -3,7 +3,7 @@ require("dotenv").config();
 const colors = require("colors");
 const app = express();
 const connectDB = require("./config/db");
-const port = process.env.PORT || 3000;
+const port = process.env.NODE_ENV === 'test' ? 3001 : 3000;
 const mongoose = require("mongoose");
 const morgan = require('morgan');
 const workoutRoutes = require('./routes/workoutRoutes')
