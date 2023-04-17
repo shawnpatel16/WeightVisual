@@ -128,6 +128,22 @@ const createWorkout = asyncHandler(async (req, res) => {
         };
         await Exercise.findOneAndUpdate(filter,update)
       }
+    } else {
+      const newExercise = new Exercise({
+        exerciseName: exercise.name,
+        sets: exercise.sets
+      })
+      const highestVolumeSet = exercise.sets.reduce((maxSet, currentSet) => {
+        const currentVolume = currentSet.weight * currentSet.reps;
+        const maxVolume = maxSet.weight * maxSet.reps;
+        return currentVolume > maxVolume ? currentSet : maxSet;
+      });
+      newExercise.highestVolumeSet = highestVolumeSet;
+      newExercise.highestVolume =
+        highestVolumeSet.weight * highestVolumeSet.reps;
+
+      // Save the new Exercise document
+      await newExercise.save();
     }
   }
   res.status(201).json(newWorkout);
