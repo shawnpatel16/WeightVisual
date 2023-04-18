@@ -1,5 +1,6 @@
 const { faker } = require("@faker-js/faker");
 
+
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -9,7 +10,11 @@ function getRandomInt(min, max) {
 function generateWorkout() {
   const workout = {
     date: faker.date.recent(),
-    split: faker.random.word(),
+    split: faker.helpers.arrayElement([
+      "Chest and Back",
+      "Arms",
+      "Legs",
+    ]),
     exercises: [],
   };
 
@@ -32,7 +37,7 @@ function generateExercise() {
     exercise.sets.push(generateSet());
   }
 
-  return JSON.stringify(exercise)
+  return exercise;
 }
 
 function generateSet() {
@@ -42,9 +47,9 @@ function generateSet() {
   };
 }
 
-const sampleWorkouts = [];
+const randomSampleWorkouts = [];
 for (let i = 0; i < 20; i++) {
-  sampleWorkouts.push(generateWorkout());
+  randomSampleWorkouts.push(generateWorkout());
 }
 
-console.log(sampleWorkouts);
+module.exports = randomSampleWorkouts

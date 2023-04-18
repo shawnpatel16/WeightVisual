@@ -10,6 +10,8 @@ const serverURL =
     ? "http://localhost:3001"
     : "http://localhost:3000";
 const sampleWorkouts1 = require("./testdata");
+const randomSampleWorkouts = require("./makeTestData");
+const Workout = require("../models/workoutModel");
 chai.use(chaiHttp);
 chai.use(require("deep-equal-in-any-order"));
 
@@ -34,11 +36,13 @@ describe("Page Data API", () => {
           });
       });
     });
-    describe("Checking responses", () => {
+    describe("Checking responses", function () {
+      this.timeout(10000);
       beforeEach(async () => {
         await dbHelper.clear();
         return dbHelper.save(sampleWorkouts1);
       });
+      
       describe("Getting < 10 workouts", () => {
         it("should return total number of workouts, weekly average, and total workouts", function (done) {
           chai
@@ -94,12 +98,67 @@ describe("Page Data API", () => {
         });
       });
     });
-    describe("Pagination", () => {
+    describe("Pagination", function ()  {
+      this.timeout(20000);
       beforeEach(async () => {
         await dbHelper.clear();
-        return dbHelper.save(sampleWorkouts2);
+        await dbHelper.save(randomSampleWorkouts);
+        const count = await Workout.countDocuments({})
+        console.log(count)
+        return 
+      })
+      
+        it("should return 10 items for the first page", (done) => 
+        {
+          chai.request(serverURL)
+            .get('/workout?page=1')
+            .end(function (err, res) {
+              console.log("Response body:", res.body);
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              expect(res.body.workouts).to.have.lengthOf(10);
+              done();
+            })
+        })
+        it("should return the next 10 items for another page", (done) => {
+          chai
+            .request(serverURL)
+            .get("/workout?page=2")
+            .end(function (err, res) {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              expect(res.body.workouts).to.have.lengthOf(10);
+              done();
+            });
+        })
+      
     })
-  })
+    describe("Sorting Order", function ()  {
+      this.timeout(20000);
+      beforeEach(async () => {
+        await dbHelper.clear();
+        return dbHelper.save(randomSampleWorkouts)
+      })
+      
+      it("should return items sorted by date in descending order", (done) => {
+        chai
+          .request(serverURL)
+          .get("/workout?page=1")
+          .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res.body.workouts).to.have.lengthOf(10);
+
+            // Check that the items are sorted by date in descending order
+            for (let i = 0; i < res.body.workouts.length - 1; i++) {
+              const date1 = new Date(res.body.workouts[i].date);
+              const date2 = new Date(res.body.workouts[i + 1].date);
+              expect(date1).to.be.at.least(date2);
+            }
+            done();
+          });
+      })
+    })
   });
 
   it("should fetch all workouts for the calendar", async () => {

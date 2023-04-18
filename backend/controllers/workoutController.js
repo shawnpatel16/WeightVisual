@@ -22,6 +22,7 @@ const getWorkoutsSummary = asyncHandler(async (req, res) => {
       weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
   }
   const page = parseInt(req.query.page) || 1;
+  console.log("Page:",page)
   const limit = parseInt(req.query.limit) || 10;
   const workouts = await Workout.find()
     .sort({ date: -1 })

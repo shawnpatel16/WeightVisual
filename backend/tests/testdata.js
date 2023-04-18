@@ -111,6 +111,6 @@ const sampleWorkouts1 = [
   },
 ];
 
-const sampleWorkouts2 = {}
 
-module.exports = { sampleWorkouts1, sampleWorkouts2 }
+
+module.exports = sampleWorkouts1
