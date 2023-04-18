@@ -10,11 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "chai-http": "^4.3.0",
     "colors": "^1.4.0",
+    "deep-equal-in-any-order": "^2.0.6",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mongoose": "^7.0.3",
     "morgan": "^1.10.0"

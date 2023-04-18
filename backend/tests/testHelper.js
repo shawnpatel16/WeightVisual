@@ -99,6 +99,7 @@ module.exports = {
       const newWorkout = new Workout(workout);
       await newWorkout.save();
       await updateExercisesForTest(newWorkout);
+
     }
   },
 
