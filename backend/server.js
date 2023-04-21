@@ -20,7 +20,7 @@ app.use((err, req, res, next) => {
 
 
 // Your routes go here
-app.use('/workout/', workoutRoutes)
+app.use('/workout', workoutRoutes)
 
 
 // Start the server

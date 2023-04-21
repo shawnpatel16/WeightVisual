@@ -36,7 +36,7 @@ const getWorkoutsSummary = asyncHandler(async (req, res) => {
 //@output: return the split name,date, id of all workouts
 const getAllWorkouts = asyncHandler(async (req, res) => {
   const workouts = await Workout.find({}, "split date _id").exec();
-  res.status(200).json(workouts);
+  res.status(200).json({ workouts });
 });
 
 //@desc: get all individual exerices or filtered exercises (not workouts but rather each individual exercise)

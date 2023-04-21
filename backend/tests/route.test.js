@@ -10,7 +10,7 @@ const serverURL =
     ? "http://localhost:3001"
     : "http://localhost:3000";
 const sampleWorkouts1 = require("./testdata");
-const randomSampleWorkouts = require("./makeTestData");
+const randomSampleWorkouts = require("./makeWorkoutData");
 const Workout = require("../models/workoutModel");
 chai.use(chaiHttp);
 chai.use(require("deep-equal-in-any-order"));
@@ -36,8 +36,8 @@ describe("Page Data API", () => {
           });
       });
     });
-    describe("Checking responses", function () {
-      this.timeout(10000);
+    describe("when there is data", function () {
+      this.timeout(20000);
       beforeEach(async () => {
         await dbHelper.clear();
         return dbHelper.save(sampleWorkouts1);
@@ -163,10 +163,57 @@ describe("Page Data API", () => {
 
   it("should fetch all workouts for the calendar", async () => {
     // test logic and assertions for fetching all workouts for the calendar
+    describe("Calendar Page", function ()  {
+      this.timeout(20000);
+      beforeEach(async () => {
+        await dbHelper.clear();
+        return dbHelper.save(randomSampleWorkouts)
+      })
+      it("should return all workouts with splits and dates", (done) => {
+        chai.request(serverURL).get("/workout/calendar").end(function (err, res) {
+          
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res.body.workouts).to.have.lengthOf(randomSampleWorkouts.length)
+           res.body.workouts.forEach((workout, index) => {
+             const expectedWorkout = _.omit(randomSampleWorkouts[index], [
+               "_id",
+               "date",
+               "createdAt",
+               "updatedAt",
+               "__v",
+               "exercises",
+             ]);
+             expectedWorkout.date = new Date(
+               randomSampleWorkouts[index].date
+             ).toISOString();
+             const sanitizedWorkout = _.omit(workout,"_id")
+             expect(sanitizedWorkout).to.deep.equal(expectedWorkout);
+           });
+          done();
+        })
+      })
+    })
   });
 
   it("should fetch personal bests", async () => {
     // test logic and assertions for fetching personal bests
+    describe("Personal Bests", function () {
+      this.timeout(20000);
+
+      beforeEach(async () => {
+        await dbHelper.clear();
+        return dbHelper.saveExercises(randomSampleExercises); // Helper function to save exercises
+      });
+
+      it("should return all exercises when no search query is provided", (done) => {
+        // Test logic and assertions for fetching all exercises
+      });
+
+      it("should return filtered exercises based on the search query", (done) => {
+        // Test logic and assertions for fetching filtered exercises based on the search query
+      });
+    });
   });
 });
 
