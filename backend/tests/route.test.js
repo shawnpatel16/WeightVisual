@@ -1,4 +1,3 @@
-const server = require("../server");
 const _ = require("lodash");
 require("dotenv").config();
 const chai = require("chai");

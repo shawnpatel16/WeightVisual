@@ -11,3 +11,9 @@ CalHeatMap (in progress)
     -Filling out squares with details of workouts on hover
     -include year at the bottom with the month
     
+
+import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
+import { BsFillArrowRightCircleFill } from "react-icons/bs";
+
+<BsFillArrowLeftCircleFill size="24" />
+<BsFillArrowRightCircleFill size="24" />

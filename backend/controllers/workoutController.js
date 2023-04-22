@@ -28,6 +28,7 @@ const getWorkoutsSummary = asyncHandler(async (req, res) => {
     .sort({ date: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
+  console.log(totalWorkouts)
   res.status(200).json({ totalWorkouts, weeklyAverage, workouts });
 });
 //@desc: get all workouts

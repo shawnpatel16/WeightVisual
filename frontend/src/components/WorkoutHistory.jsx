@@ -5,7 +5,7 @@ import Workout from './Workout'
 // It should show the date, how far from the current date, the split,
 // edit and delete buttons
 // Can also include pagination to scroll thru
-const WorkoutHistory = () => {
+const WorkoutHistory = ({workouts}) => {
   return (
     <div>
       <h2 className="text-lg font-medium text-primary">Your Workout History</h2>
@@ -20,7 +20,7 @@ const WorkoutHistory = () => {
           </tr>
         </thead>
         <tbody>
-          {mockData.map((item, index) => (
+          {workouts.map((item, index) => (
             <Workout key={index} item={item} />
           ))}
         </tbody>
