@@ -94,14 +94,24 @@ module.exports = {
     await Exercise.deleteMany({});
   },
 
-  async save(workouts) {
+  async saveWorkouts(workouts) {
+    const savedWorkouts = [];
     for (const workout of workouts) {
+      
       const newWorkout = new Workout(workout);
       await newWorkout.save();
       await updateExercisesForTest(newWorkout);
+      savedWorkouts.push(newWorkout);
 
     }
+    return savedWorkouts
   },
-
+  async saveExercises(exercises) {
+    
+    for (const exercise of exercises) {
+      const newExercise = new Exercise(exercise)
+      await newExercise.save();
+    }
+  }
   // You can add other methods as needed for your tests
 };

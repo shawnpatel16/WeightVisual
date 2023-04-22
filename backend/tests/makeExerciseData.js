@@ -1,3 +1,12 @@
+const { faker } = require("@faker-js/faker");
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
 function generateSetSample() {
   const weight = getRandomInt(10, 300);
   const reps = getRandomInt(1, 12);
@@ -40,4 +49,4 @@ for (let i = 0; i < 20; i++) {
   randomSampleExercises.push(generateExerciseSample());
 }
 
-module.exports = randomSampleExercises
+module.exports = randomSampleExercises;

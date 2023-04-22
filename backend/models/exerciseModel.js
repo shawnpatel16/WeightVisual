@@ -5,12 +5,15 @@ const mongoose = require("mongoose");
 // highest volume set for every day
 
 //Schema for highest volume set per exercise per day
-const setSchema = new mongoose.Schema({
-  weight: Number,
-  reps: Number,
-  volume: Number,
-  date: Date,
-});
+const setSchema = new mongoose.Schema(
+  {
+    weight: Number,
+    reps: Number,
+    volume: Number,
+    date: Date,
+  },
+  { _id: false }
+);
 
 //schema for each individual exercise containing the highest volume sets performed for that exercise
 const exerciseSchema = new mongoose.Schema(
