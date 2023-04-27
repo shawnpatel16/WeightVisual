@@ -1,0 +1,25 @@
+.react-autosuggest__input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.react-autosuggest__suggestions-container {
+  position: absolute;
+  background-color: hsl(0, 0%, 100%);
+  border: 1px solid #ccc;
+  z-index: 1;
+  max-height: 200px; /* Set the maximum height of the dropdown */
+  overflow-y: auto;  /* Make the dropdown scrollable when the content exceeds the max-height */
+  overflow-x: hidden;/* Hide horizontal scrollbar */
+}
+
+.react-autosuggest__suggestion {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  background-color: #ddd;
+}
+

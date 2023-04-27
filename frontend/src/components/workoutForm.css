@@ -1,0 +1,94 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+@layer components {
+  /* Workout Form */
+  .workout-form {
+    /* Add your styles for the workout form */
+  }
+
+  /* Split Name */
+  .split-name-wrapper {
+    /* Add your styles for the split name wrapper */
+  }
+
+  .split-name-label {
+    @apply text-gray-300 font-semibold;
+  }
+  .autosuggest-container {
+    @apply bg-gray-900 border border-none !important; /* Change this to the background color of your theme */
+    /* Add any other styles you want to apply */
+  }
+
+  .split-name-select {
+    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2;
+  }
+
+  /* Exercise */
+  .exercise-label {
+    @apply text-gray-300 font-semibold mb-2;
+  }
+
+  .exercise-wrapper {
+    /* Add your styles for the exercise wrapper */
+  }
+
+  .exercise-row {
+    /* Add your styles for the exercise row */
+  }
+
+  .exercise-name-label {
+    @apply text-gray-300 font-semibold;
+  }
+
+  .exercise-input {
+    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2;
+  }
+
+  .delete-exercise-btn {
+    @apply text-red-600 focus:outline-none;
+  }
+
+  /* Sets */
+  .set-wrapper {
+    /* Add your styles for the set wrapper */
+  }
+
+  .set-label {
+    @apply text-gray-300 font-semibold;
+  }
+
+  .weight-label {
+    @apply text-gray-300 font-semibold;
+  }
+
+  .weight-input {
+    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2;
+  }
+
+  .reps-label {
+    @apply text-gray-300 font-semibold;
+  }
+
+  .reps-input {
+    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2;
+  }
+
+  .delete-set-btn {
+    @apply text-red-600 focus:outline-none;
+  }
+
+  .add-set-btn {
+    @apply text-white;
+  }
+
+  .add-exercise-wrapper {
+    /* Add your styles for the delete set button */
+  }
+
+  .add-exercise-btn {
+    @apply text-white;
+  }
+}
