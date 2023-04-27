@@ -2,6 +2,7 @@ const dbHelper = require("./testHelper");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const randomSampleWorkouts = require("./makeWorkoutData");
+const randomSampleExercises = require("./makeExerciseData")
 const mongoose = require("mongoose");
 
 
@@ -28,6 +29,6 @@ mongoose.connection.once("open", () => {
   // Create some sample workout data
 
   // Save the sample data to the database
-   await dbHelper.saveWorkouts(randomSampleWorkouts);
+   await dbHelper.saveExercises(randomSampleExercises);
   console.log("Data saved successfully!");
 })();

@@ -47,12 +47,14 @@ const getAllWorkouts = asyncHandler(async (req, res) => {
 
 const getPersonalBests = asyncHandler(async (req, res) => {
   const exercises = await Exercise.find({});
-
-  if (req.query.search) {
-    const searchQuery = req.query.search;
+  console.log(req.query)
+  if (Object.keys(req.query).length !== 0) {
+    const searchQuery = req.query;
     const filteredExercises = exercises.filter((exercise) =>
-      exercise.exerciseName.toLowerCase().includes(searchQuery.toLowerCase())
+      exercise.exerciseName.toLowerCase().includes(searchQuery.exerciseName.toLowerCase())
+      
     );
+    console.log(filteredExercises);
     res.status(200).json({ filteredExercises });
   } else {
     res.status(200).json({ exercises });

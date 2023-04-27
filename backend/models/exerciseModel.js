@@ -21,6 +21,7 @@ const exerciseSchema = new mongoose.Schema(
     exerciseName: {
       type: String,
       required: true,
+      unique:true,
     },
     highestVolume: Number,
     highestVolumeSet: {

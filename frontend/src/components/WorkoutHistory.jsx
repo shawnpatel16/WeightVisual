@@ -7,7 +7,7 @@ import Workout from './Workout'
 // Can also include pagination to scroll thru
 const WorkoutHistory = ({workouts}) => {
   return (
-    <div>
+    <div className="">
       <h2 className="text-lg font-medium text-primary">Your Workout History</h2>
       <table className="bg-gray-700 table-auto text-secondary">
         <thead className="text-secondary text-lg border">

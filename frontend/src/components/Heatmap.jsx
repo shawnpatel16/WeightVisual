@@ -5,12 +5,11 @@ import "react-tooltip/dist/react-tooltip.css";
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 
-const WorkoutHeatmap = ({workouts}) => {
-  const workoutData = [
-    { date: "2023-04-05", value: 1 },
-    { date: "2023-04-04", value: 1 },
-    // ... more data
-  ];
+const WorkoutHeatmap = ({ workouts, className }) => {
+  const workoutData = workouts.map((workout) => {
+    return {date:workout.date, value:1}
+  })
+  
 
   const [startDate, setStartDate] = useState(new Date("2023-04-01"));
 
@@ -27,20 +26,23 @@ const WorkoutHeatmap = ({workouts}) => {
   };
 
   return (
-    <div>
-      <button onClick={handlePrevious}>
-        <BsFillArrowLeftCircleFill size="24" />
-      </button>
-      <button onClick={handleNext}>
-        <BsFillArrowRightCircleFill size="24" />
-      </button>
+    <div className={`bg-gray-700 rounded-xl shadow-md pt-2 p-2 ${className}`}>
+      <div className="flex justify-around">
+        <button onClick={handlePrevious}>
+          <BsFillArrowLeftCircleFill size="24" />
+        </button>
+        <button onClick={handleNext}>
+          <BsFillArrowRightCircleFill size="24" />
+        </button>
+      </div>
       <HeatMap
         value={workoutData}
         rectSize={15}
+        style={{ color: "rgb(88 101 242)" }}
         legendCellSize={0}
         startDate={startDate}
         space={2}
-        width={900}
+        width="100%"
         weekLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
         monthLabels={[
           "Jan",
@@ -64,7 +66,6 @@ const WorkoutHeatmap = ({workouts}) => {
           32: "#196127",
         }}
         rectRender={(props, data) => {
-          
           const dateComponents = data.date.split("/");
           const date = new Date(
             parseInt(dateComponents[0]),

@@ -1,0 +1,9 @@
+/* heatmap.css */
+.heatmap-container .month-label,
+.heatmap-container .week-label {
+  fill: var(--text-secondary-color);
+}
+
+.heatmap-container .react-heat-map {
+  width: calc(100% - 2rem); /* Adjust the width to your preference */
+}

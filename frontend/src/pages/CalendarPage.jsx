@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios"
 const localizer = momentLocalizer(moment);
 
-const CalendarPage = ({ events }) => {
+const CalendarPage = () => {
+  const [events, setEvents] = useState([]);
   const clickRef = useRef(null);
   const buildMessage = (slotInfo) => {
     return `Clicked on: ${slotInfo.start.toLocaleDateString()}`;
@@ -17,6 +18,28 @@ const CalendarPage = ({ events }) => {
      * This is to prevent a memory leak, in the off chance that you
      * teardown your interface prior to the timed method being called.
      */
+    const fetchData = async () => {
+      const response = await axios.get("/api/workout/calendar");
+      const data = response.data.workouts;
+
+      const formattedEvents = data.map((workout) => {
+        const startDate = new Date(workout.date);
+        const endDate = new Date(workout.date);
+        endDate.setHours(endDate.getHours() + 1); // Assuming each workout is 1 hour long
+
+        return {
+          start: startDate,
+          end: endDate,
+          title: `(${workout.split})`,
+          allDay: false,
+          resource: workout, // You can store the entire workout object as a custom field if needed
+        };
+      });
+
+      setEvents(formattedEvents);
+    };
+
+    fetchData();
     return () => {
       window.clearTimeout(clickRef?.current);
     };

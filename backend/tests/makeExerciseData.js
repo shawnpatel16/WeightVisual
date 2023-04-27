@@ -20,8 +20,7 @@ function generateSetSample() {
   };
 }
 
-function generateExerciseSample() {
-  const exerciseName = faker.random.word();
+function generateExerciseSample(exerciseName) {
   const sets = [];
 
   for (let i = 0; i < getRandomInt(1, 5); i++) {
@@ -45,8 +44,20 @@ function generateExerciseSample() {
 }
 
 const randomSampleExercises = [];
-for (let i = 0; i < 20; i++) {
-  randomSampleExercises.push(generateExerciseSample());
+const exerciseNames = new Set();
+const desiredNumberOfExercises = 20;
+
+while (exerciseNames.size < desiredNumberOfExercises) {
+  const newExerciseName = faker.random.word();
+
+  // Only add the exercise if its name hasn't been generated before
+  if (!exerciseNames.has(newExerciseName)) {
+    exerciseNames.add(newExerciseName);
+
+    const newExercise = generateExerciseSample(newExerciseName);
+    randomSampleExercises.push(newExercise);
+  }
 }
+
 
 module.exports = randomSampleExercises;

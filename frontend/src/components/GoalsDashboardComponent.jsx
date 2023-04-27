@@ -1,7 +1,6 @@
 import React from 'react'
-// Get the length of the workouts from the database
-const WorkoutCounter = ({totalWorkouts, className}) => {
-  
+
+const GoalsDashboardComponent = ({className}) => {
   return (
     <div
       className={`bg-gray-700 rounded-xl shadow-md p-6 h-48 flex flex-col justify-between ${className}`}
@@ -11,11 +10,11 @@ const WorkoutCounter = ({totalWorkouts, className}) => {
       </h2>
       <div className="flex flex-grow items-center justify-center">
         <span className="text-4xl font-semibold text-secondary">
-          {totalWorkouts}
+          Hello world
         </span>
       </div>
     </div>
   );
 }
 
-export default WorkoutCounter
+export default GoalsDashboardComponent

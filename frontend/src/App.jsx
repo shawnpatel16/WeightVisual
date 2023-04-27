@@ -6,25 +6,37 @@ import HomePage from './pages/HomePage'
 import CalendarPage from './pages/CalendarPage'
 import mockData from './data'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-
+import PersonalBestsPage from './pages/PersonalBestsPage'
+import Modal from "./components/Modal";
+import WorkoutForm from "./components/WorkoutForm";
 
 function App() {
-  
-const events = mockData.map((workout) => ({
-  title: workout.split,
-  start: new Date(workout.date),
-  end: new Date(workout.date),
-  allDay:true,
-}));
+  const [showModal, setShowModal] = useState(false);
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
   return (
     <>
       <Router>
         <div className="flex">
-          <Navbar />
+          <Navbar setShowModal={openModal} />
+          <Modal
+            isOpen={showModal}
+            onClose={closeModal}
+            title="Add/Edit Workout"
+          >
+            <WorkoutForm onClose={closeModal} />
+          </Modal>
         </div>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/personal-bests" element={<PersonalBestsPage />} />
           {/* <Route path = "/workout/:date" element={<WorkoutPage/>} */}
         </Routes>
       </Router>

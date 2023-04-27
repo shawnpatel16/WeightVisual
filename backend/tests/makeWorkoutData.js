@@ -44,6 +44,7 @@ function generateSet() {
   return {
     reps: getRandomInt(1, 12),
     weight: getRandomInt(10, 300),
+    date: faker.date.recent().toISOString(),
   };
 }
 
