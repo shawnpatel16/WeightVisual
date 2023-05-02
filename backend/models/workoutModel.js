@@ -11,7 +11,8 @@ const setSchema = new mongoose.Schema({
 const exerciseSchema = new mongoose.Schema({
   name: String,
   sets: [setSchema],
-})
+  progressMade: Boolean,
+});
 
 const workoutSchema = new mongoose.Schema({
   date: {
@@ -19,7 +20,8 @@ const workoutSchema = new mongoose.Schema({
     required: true,
   },
   split: String,
-  exercises:[exerciseSchema]
+  exercises: [exerciseSchema],
+  progressMade: Boolean
 },{timestamps:true})
 
 const Workout = mongoose.model("Workout", workoutSchema);

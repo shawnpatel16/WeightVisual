@@ -40,8 +40,8 @@ const Navbar = ({setShowModal}) => {
           />
           <SideBarIcon
             icon={<GiWeightLiftingUp size="28" />}
-            text="Personal Bests"
-            link="/calendar"
+            text="Goals"
+            link="/goals"
           />
         </div>
         <div className="pb-3">

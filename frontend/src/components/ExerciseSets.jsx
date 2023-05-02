@@ -1,7 +1,7 @@
 import React from "react";
 import { MdEdit, MdDeleteForever } from "react-icons/md";
 const ExerciseSets = ({ item }) => {
-  console.log(item);
+  
   return (
     <tr>
       <td className="">{item.date}</td>

@@ -5,24 +5,16 @@ import WorkoutCounter from '../components/WorkoutCounter'
 import WeeklyAverage from '../components/WeeklyAverage'
 import WorkoutHistory from '../components/WorkoutHistory'
 import GoalsDashboardComponent from "../components/GoalsDashboardComponent";
-const HomePage = () => {
-  const [totalWorkouts, setTotalWorkouts] = useState(0);
-  const [weeklyAverage, setWeeklyAverage] = useState(0);
-  const [workouts, setWorkouts] = useState([]);
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(
-        "/api/workout"
-      );
-      const data = response.data;
-      setTotalWorkouts(data.totalWorkouts);
-      setWeeklyAverage(data.weeklyAverage);
-      setWorkouts(data.workouts);
-    };
-
-    fetchData();
-  }, []);
+const HomePage = ({
+  onEditWorkout,
+  totalWorkouts,
+  weeklyAverage,
+  workouts,
+  onUpdateWorkout,
+  onDeleteWorkout,
+  onUndoDelete,
+  deletedTimeoutId,
+}) => {
   return (
     <div className="pl-24">
       <h1 className="text-4xl font-bold mt-10 mb-6 ml-4">Dashboard</h1>
@@ -45,10 +37,17 @@ const HomePage = () => {
         </div>
       </div>
       <div className="mt-8 bg-gray-700 rounded-xl shadow-md p-6">
-        <WorkoutHistory workouts={workouts} />
+        <WorkoutHistory
+          workouts={workouts}
+          onDelete={onDeleteWorkout}
+          onUndoDelete={onUndoDelete}
+          deletedTimeoutId={deletedTimeoutId}
+          onEditWorkout={onEditWorkout}
+          onUpdateWorkout={onUpdateWorkout}
+        />
       </div>
     </div>
   );
-}
+};
 
 export default HomePage

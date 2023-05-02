@@ -29,6 +29,7 @@ mongoose.connection.once("open", () => {
   // Create some sample workout data
 
   // Save the sample data to the database
-   await dbHelper.saveExercises(randomSampleExercises);
+  //  await dbHelper.saveExercises(randomSampleExercises);
+      await dbHelper.saveWorkouts(randomSampleWorkouts)
   console.log("Data saved successfully!");
 })();

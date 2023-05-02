@@ -1,10 +1,19 @@
-import React, {useState} from 'react'
-import { Formik, Form, useField, useFormikContext, Field, FieldArray } from "formik";
+import React, { useState } from "react";
+import {
+  Formik,
+  Form,
+  useField,
+  useFormikContext,
+  Field,
+  FieldArray,
+} from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import { AiOutlinePlus } from "react-icons/ai";
 import Autosuggest from "react-autosuggest";
 import "./autosuggest.css";
-import "./workoutForm.css"
+import "./workoutForm.css";
+import { toast } from "react-toastify";
+import axios from "axios";
 import * as Yup from "yup";
 const suggestedExercises = {
   "Upper Body": [
@@ -43,7 +52,7 @@ const suggestedExercises = {
     "Good Morning",
     "Leg Extensions",
   ],
-  "Push": [
+  Push: [
     "Bench Press",
     "Overhead Press",
     "Dumbbell Bench Press",
@@ -53,7 +62,7 @@ const suggestedExercises = {
     "Dumbbell Fly",
     "Cable Tricep Extension",
   ],
-  "Pull": [
+  Pull: [
     "Lat Pulldown",
     "Cable Row",
     "Dumbbell Row",
@@ -67,7 +76,7 @@ const suggestedExercises = {
     "Pull-ups",
     "Chin-ups",
   ],
-  "Legs": [
+  Legs: [
     "Squat",
     "Deadlift",
     "Lunge",
@@ -113,18 +122,57 @@ const suggestedExercises = {
     "Good Morning",
     "Leg Extensions",
   ],
-  "Chest/Back": ["Bench Press", "Pull-ups","Dumbbell Bench Press","Dumbbell Row","Dumbbell Pullover","Dumbbell Fly","Lat Pulldown","Cable Rows"],
-  "Arms": ["Dumbbell Curl","Dumbbell Tricep Extension","Dumbbell Skullcrusher","Skullcrusher","Hammer Curl","Dumbbell Incline Curl","EZ Bar Curls","Cable Tricep Extension"],
-  "Legs/Shoulders": ["Squat","Overhead Press","Lunge","Leg Press","Leg Extension","Leg Curl","Calf Raise","Romanian Deadlift","Good Morning","Leg Extensions","Lateral Raise","Dumbbell Overhead Press","Dumbbell Rear Delt Fly","Dumbbell Shrug"],
+  "Chest/Back": [
+    "Bench Press",
+    "Pull-ups",
+    "Dumbbell Bench Press",
+    "Dumbbell Row",
+    "Dumbbell Pullover",
+    "Dumbbell Fly",
+    "Lat Pulldown",
+    "Cable Rows",
+  ],
+  Arms: [
+    "Dumbbell Curl",
+    "Dumbbell Tricep Extension",
+    "Dumbbell Skullcrusher",
+    "Skullcrusher",
+    "Hammer Curl",
+    "Dumbbell Incline Curl",
+    "EZ Bar Curls",
+    "Cable Tricep Extension",
+  ],
+  "Legs/Shoulders": [
+    "Squat",
+    "Overhead Press",
+    "Lunge",
+    "Leg Press",
+    "Leg Extension",
+    "Leg Curl",
+    "Calf Raise",
+    "Romanian Deadlift",
+    "Good Morning",
+    "Leg Extensions",
+    "Lateral Raise",
+    "Dumbbell Overhead Press",
+    "Dumbbell Rear Delt Fly",
+    "Dumbbell Shrug",
+  ],
 };
-const WorkoutForm = ({closeModal}) => {
+const WorkoutForm = ({
+  closeModal,
+  date,
+  workoutToEdit,
+  isEditing,
+  onUpdateWorkout,
+}) => {
   const [suggestions, setSuggestions] = useState([]);
-  const getSuggestions = (value,splitName) => {
+  const getSuggestions = (value, splitName) => {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
-    console.log(value)
+    
     const splitExercises = suggestedExercises[splitName] || [];
-    console.log(splitExercises)
+    
     return inputLength === 0
       ? []
       : splitExercises.filter(
@@ -141,38 +189,59 @@ const WorkoutForm = ({closeModal}) => {
   };
 
   const getSuggestionValue = (suggestion) => suggestion;
-  
-  const handleSubmit = (values) => {
-    console.log(values);
-    // ... handle form submission ...
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      let response;
+      if (isEditing) {
+        
+        response = await axios.put(`/api/workout/${workoutToEdit._id}`, values);
+        onUpdateWorkout(response.data.updatedWorkout);
+        
+      } else {
+        response = await axios.post("api/workout/", values);
+      }
+      
+      // ... handle successful form submission
+    } catch (error) {
+      // ... handle form submission errors
+    } finally {
+      setSubmitting(false);
+      toast.success(
+        isEditing
+          ? "Workout updated successfully!"
+          : "Workout added successfully!"
+      );
+      closeModal();
+    }
   };
 
   return (
     <Formik
       initialValues={{
-        splitName: "",
-        exercises: [],
+        split: isEditing ? workoutToEdit.split : "",
+        exercises: isEditing ? workoutToEdit.exercises : [],
+        date: isEditing ? workoutToEdit.date : date,
       }}
       onSubmit={handleSubmit}
     >
       {({ values, handleChange, setFieldValue }) => {
-        
         return (
           <Form className="space-y-6 workout-form">
             <div className="flex flex-wrap items-center space-x-4 split-name-wrapper">
-              <label htmlFor="splitName" className="text-lg split-name-label">
+              <label htmlFor="split" className="text-lg split-name-label">
                 Split Name
               </label>
               <Field
                 as="select"
-                name="splitName"
+                name="split"
                 className="rounded split-name-select"
               >
                 <option value="">Select a split</option>
                 <option value="Upper Body">Upper Body</option>
                 <option value="Lower Body">Lower Body</option>
                 <option value="Push">Push</option>
-                <option value="Push">Pull</option>
+                <option value="Pull">Pull</option>
                 <option value="Legs">Legs</option>
                 <option value="Full Body">Full Body</option>
                 <option value="Chest/Back">Chest/Back</option>
@@ -180,7 +249,15 @@ const WorkoutForm = ({closeModal}) => {
                 <option value="Legs/Shoulders">Legs/Shoulders</option>
               </Field>
             </div>
-            
+            <label className="flex items-center">
+              <Field
+                type="checkbox"
+                name="progressMade"
+                className="form-checkbox"
+              />
+              <span className="ml-2">Progress Made</span>
+            </label>
+
             <FieldArray name="exercises">
               {({ remove, push }) => (
                 <>
@@ -195,7 +272,7 @@ const WorkoutForm = ({closeModal}) => {
                         </label>
                         <Autosuggest
                           suggestions={suggestions}
-                          theme={{container:'autosuggest-container'}}
+                          theme={{ container: "autosuggest-container" }}
                           onSuggestionsFetchRequested={({ value }) =>
                             onSuggestionsFetchRequested(
                               { value },
@@ -222,7 +299,14 @@ const WorkoutForm = ({closeModal}) => {
                             className: "h-6 exercise-input",
                           }}
                         />
-
+                        <label className="flex items-center">
+                          <Field
+                            type="checkbox"
+                            name={`exercises.${index}.progressMade`}
+                            className="form-checkbox"
+                          />
+                          <span className="ml-2">Progress Made</span>
+                        </label>
                         <button
                           type="button"
                           onClick={() => remove(index)}
@@ -283,7 +367,7 @@ const WorkoutForm = ({closeModal}) => {
                                 onClick={() =>
                                   pushSet({ weight: "", reps: "" })
                                 }
-                                className='add-set-btn'
+                                className="add-set-btn"
                               >
                                 <AiOutlinePlus size={15} />
                               </button>
@@ -312,6 +396,6 @@ const WorkoutForm = ({closeModal}) => {
       }}
     </Formik>
   );
-}
+};
 
-export default WorkoutForm
+export default WorkoutForm;

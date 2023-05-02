@@ -167,6 +167,8 @@ const updateWorkout = asyncHandler(async (req, res) => {
       runValidators: true,
     }
   );
+  console.log(req.params.id)
+  console.log(req.body)
   if (!updatedWorkout) {
     res.status(404).send(new Error("Workout not found"));
   }
@@ -233,7 +235,7 @@ const updateWorkout = asyncHandler(async (req, res) => {
       }
     }
   }
-
+  console.log(updatedWorkout)
   res.status(200).json({ updatedWorkout });
 });
 
