@@ -3,30 +3,36 @@ import Modal from "./Modal";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
-const handleSubmit = async (values, { setSubmitting }) => {
-  try {
-    const response = await axios.post("/api/auth/login", values);
-    // Check if the response is successful and contains a token
-    if (response.status === 200 && response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-      // Navigate to the dashboard or perform any other action after successful login
-    }
-  } catch (error) {
-    // Handle the error (e.g., show an error message to the user)
-  } finally {
-    setSubmitting(false);
-  }
 
-};
 
 const LoginModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await axios.post("/api/auth/login", values);
+      // Check if the response is successful and contains a token
+      if (response.status === 200 && response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${response.data.token}`;
+        // Navigate to the dashboard or perform any other action after successful login
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      // Handle the error (e.g., show an error message to the user)
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Login">
       <Formik
