@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ExerciseSets {
+  setId      Int        @id @default(autoincrement())
+  weight     Int
+  reps       Int
+  volume     Int
+  date       DateTime   @db.Date
+  exerciseId Int?
+  exercises  Exercises? @relation(fields: [exerciseId], references: [exerciseId],  onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Exercises {
+  exerciseId            Int            @id @default(autoincrement())
+  exerciseName          String         @db.VarChar(255)
+  exerciseProgressMade  Boolean
+  workoutId             Int?
+  exerciseSets          ExerciseSets[]
+  workouts              Workouts?      @relation(fields: [workoutId], references: [workoutId], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Goals {
+  goalId   Int        @id @default(autoincrement())
+  title    String?    @db.VarChar(255)
+  completed Boolean?  @default(false)
+  userId   Int?
+  users    Users?     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  subgoals Subgoals[] 
+}
+
+model Subgoals {
+  subgoalId   Int      @id @default(autoincrement())
+  description String?  @db.VarChar(255)
+  completed   Boolean?
+  goalId      Int?
+  goals       Goals?   @relation(fields: [goalId], references: [goalId],onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Users {
+  userId    Int        @id @default(autoincrement())
+  username  String     @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  email     String     @unique @db.VarChar(255)
+  goals     Goals[]
+  workouts  Workouts[]
+}
+
+model Workouts {
+  workoutId            Int         @id @default(autoincrement())
+  date                 DateTime    @db.Date
+  split                String      @db.VarChar(255)
+  workoutProgressMade  Boolean
+  userId               Int?
+  exercises            Exercises[]
+  users                Users?      @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+}

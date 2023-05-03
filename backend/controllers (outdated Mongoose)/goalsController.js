@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const asyncHandler = require("express-async-handler");
 const moment = require("moment");
-const Goal = require("../models/goalsModel")
+const Goal = require("../models (outdated mongoose)/goalsModel")
 
 const getGoals = asyncHandler(async (req, res) => {
     const goals = await Goal.find({})

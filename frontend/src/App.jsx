@@ -16,6 +16,7 @@ import WorkoutForm from "./components/WorkoutForm";
 import GoalsPage from "./pages/GoalsPage"
 import { date } from 'yup'
 import { DateLocalizer } from 'react-big-calendar'
+import ShowPage from './pages/ShowPage'
 function App() {
   const [showModal, setShowModal] = useState(false);
   const [workoutToEdit, setWorkoutToEdit] = useState(null);
@@ -24,7 +25,11 @@ function App() {
   const [weeklyAverage, setWeeklyAverage] = useState(0);
   const [workouts, setWorkouts] = useState([]);
   const [deletedTimeoutId, setDeletedTimeoutId] = useState(null);
-  const currDate = new Date()
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+
+  const currDate = new Date();
   const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
 
   useEffect(() => {
@@ -50,47 +55,43 @@ function App() {
     setIsEditing(true);
     setShowModal(true);
   };
-   
-   
 
-   const handleDeleteWorkout = (workoutId) => {
-     const deletedWorkout = workouts.find(
-       (workout) => workout._id === workoutId
-     );
-     setWorkouts(workouts.filter((workout) => workout._id !== workoutId));
-
-     const deleteWorkout = async () => {
-       const response = await axios.delete(`/api/workout/${workoutId}`);
-     };
-
-     const timeoutId = setTimeout(() => {
-       deleteWorkout();
-     }, 5000); // Delay the deletion request by 5 seconds
-
-     setDeletedTimeoutId(timeoutId);
-     return { timeoutId, deletedWorkout };
-   };
-   const handleUndoDelete = (deletedWorkout) => {
-     setWorkouts((prevWorkouts) => [...prevWorkouts, deletedWorkout]);
-   };
-   
-  const handleUpdateWorkout = (updatedWorkout) => {
-    
-    
-    const updatedWorkouts = workouts.map((workout) =>
-      workout._id === updatedWorkout._id? updatedWorkout : workout
+  const handleDeleteWorkout = (workoutId) => {
+    const deletedWorkout = workouts.find(
+      (workout) => workout._id === workoutId
     );
-    
+    setWorkouts(workouts.filter((workout) => workout._id !== workoutId));
+
+    const deleteWorkout = async () => {
+      const response = await axios.delete(`/api/workout/${workoutId}`);
+    };
+
+    const timeoutId = setTimeout(() => {
+      deleteWorkout();
+    }, 5000); // Delay the deletion request by 5 seconds
+
+    setDeletedTimeoutId(timeoutId);
+    return { timeoutId, deletedWorkout };
+  };
+  const handleUndoDelete = (deletedWorkout) => {
+    setWorkouts((prevWorkouts) => [...prevWorkouts, deletedWorkout]);
+  };
+
+  const handleUpdateWorkout = (updatedWorkout) => {
+    const updatedWorkouts = workouts.map((workout) =>
+      workout._id === updatedWorkout._id ? updatedWorkout : workout
+    );
+
     setWorkouts(updatedWorkouts);
   };
-  
+
 
   return (
     <>
       <ToastContainer />
       <Router>
         <div className="flex">
-          <Navbar setShowModal={openModal} />
+          {isLoggedIn && <Navbar setShowModal={openModal} />}
           <Modal
             isOpen={showModal}
             onClose={closeModal}
@@ -106,8 +107,9 @@ function App() {
           </Modal>
         </div>
         <Routes>
+          <Route path="/" element={<ShowPage />} />
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <HomePage
                 onEditWorkout={handleEditWorkout}
