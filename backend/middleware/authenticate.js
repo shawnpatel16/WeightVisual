@@ -1,20 +1,20 @@
 const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const prisma = require("../../prismaClient");
-
+const prisma = require("../prisma/prismaClient");
 
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: (req) => req.cookies.token,
   secretOrKey: process.env.JWT_SECRET,
 };
 
 const jwtVerify = async (jwtPayload, done) => {
+  console.log("JWT Payload:", jwtPayload);
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: jwtPayload.id },
+    const user = await prisma.users.findUnique({
+      where: { userId: jwtPayload.id },
       select: {
-        id: true,
+        userId: true,
         email: true,
       },
     });
@@ -33,6 +33,16 @@ const jwtVerify = async (jwtPayload, done) => {
 passport.use(new JwtStrategy(jwtOptions, jwtVerify));
 
 // Authentication middleware
-const authenticate = passport.authenticate("jwt", { session: false });
-
+const authenticate = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
 module.exports = authenticate;

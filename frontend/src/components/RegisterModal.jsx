@@ -16,17 +16,15 @@ const RegisterSchema = Yup.object().shape({
 
 
 
-const RegisterModal = ({ isOpen, onClose }) => {
+const RegisterModal = ({ isOpen, onClose, login }) => {
    const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("/api/auth/register", values);
+      const response = await axios.post("/api/signin/register", values);
 
-      if (response.status === 200 && response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.token}`;
+      if (response.status === 200) {
+      
+        login()
         navigate("/dashboard");
       }
     } catch (error) {
@@ -42,27 +40,50 @@ const RegisterModal = ({ isOpen, onClose }) => {
         onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
-          <Form>
-            <div className="text-white">
-              <div>
-                <label htmlFor="email">Email</label>
-                <Field type="email" name="email" />
-                <ErrorMessage name="email" component="div" />
-              </div>
-              <div>
-                <label htmlFor="password">Password</label>
-                <Field type="password" name="password" />
-                <ErrorMessage name="password" component="div" />
-              </div>
-              <div>
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <Field type="password" name="confirmPassword" />
-                <ErrorMessage name="confirmPassword" component="div" />
-              </div>
-              <button type="submit" disabled={isSubmitting}>
-                Register
-              </button>
+          <Form className="space-y-6 goals-form">
+            <div className="space-y-4">
+              <label htmlFor="email" className="text-lg text-white">
+                Email
+              </label>
+              <Field
+                type="email"
+                name="email"
+                className="w-full rounded long-term-goal-input"
+              />
+              <ErrorMessage name="email" component="div" />
             </div>
+
+            <div className="space-y-4">
+              <label htmlFor="password" className="text-lg text-white">
+                Password
+              </label>
+              <Field
+                type="password"
+                name="password"
+                className="w-full rounded long-term-goal-input"
+              />
+              <ErrorMessage name="password" component="div" />
+            </div>
+
+            <div className="space-y-4">
+              <label htmlFor="confirmPassword" className="text-lg text-white">
+                Confirm Password
+              </label>
+              <Field
+                type="password"
+                name="confirmPassword"
+                className="w-full rounded long-term-goal-input"
+              />
+              <ErrorMessage name="confirmPassword" component="div" />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="submit-button"
+            >
+              Register
+            </button>
           </Form>
         )}
       </Formik>

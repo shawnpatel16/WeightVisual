@@ -14,6 +14,7 @@ const HomePage = ({
   onDeleteWorkout,
   onUndoDelete,
   deletedTimeoutId,
+  mainGoals
 }) => {
   return (
     <div className="pl-24">
@@ -29,7 +30,7 @@ const HomePage = ({
               weeklyAverage={weeklyAverage}
               className="w-1/3 mx-4"
             />
-            <GoalsDashboardComponent className="w-1/3 mx-4" />
+            <GoalsDashboardComponent mainGoals={mainGoals}className="w-1/3 mx-4" />
           </div>
         </div>
         <div className="col-span-1 lg:col-span-1">

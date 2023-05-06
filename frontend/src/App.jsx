@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios'
+import LoginHandler from "./LoginHandler";
 import './index.css'
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import CalendarPage from './pages/CalendarPage'
 import mockData from './data'
 import moment from 'moment'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PersonalBestsPage from './pages/PersonalBestsPage'
@@ -26,9 +33,54 @@ function App() {
   const [workouts, setWorkouts] = useState([]);
   const [deletedTimeoutId, setDeletedTimeoutId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mainGoals, setMainGoals] = useState([])
 
 
 
+
+  const handleUserLogin = () => {
+    setIsLoggedIn(true);
+    ;
+  }
+  const handleUserLogout = async () => {
+    try {
+      const response = await axios.post(
+        "/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setIsLoggedIn(false);
+      } else {
+        console.error("Error logging out:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
+
+    useEffect(() => {
+      const checkAuth = async () => {
+        try {
+          const response = await axios.get("/api/auth/isAuthenticated");
+          if (response.data.message === "Authenticated") {
+            // The user is authenticated
+            setIsLoggedIn(true);
+          } else {
+            // The user is not authenticated
+            setIsLoggedIn(false);
+          }
+        } catch (error) {
+          console.error("Error checking authentication:", error);
+          setIsLoggedIn(false);
+        }
+      };
+
+      checkAuth();
+    }, []);
+  
   const currDate = new Date();
   const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
 
@@ -36,13 +88,17 @@ function App() {
     const fetchData = async () => {
       const response = await axios.get("/api/workout");
       const data = response.data;
-      setTotalWorkouts(data.totalWorkouts);
-      setWeeklyAverage(data.weeklyAverage);
-      setWorkouts(data.workouts);
+      console.log(data)
+      setTotalWorkouts(data.dashboardData.totalWorkouts);
+      setWeeklyAverage(data.dashboardData.weeklyAverageWorkouts);
+      setWorkouts(data.dashboardData.allWorkouts);
+      setMainGoals(data.dashboardData.topThreeGoals)
     };
 
-    fetchData();
-  }, []);
+    if(isLoggedIn) {
+      fetchData();
+    }
+  }, [isLoggedIn]);
   const openModal = () => {
     setShowModal(true);
   };
@@ -91,7 +147,9 @@ function App() {
       <ToastContainer />
       <Router>
         <div className="flex">
-          {isLoggedIn && <Navbar setShowModal={openModal} />}
+          {isLoggedIn && (
+            <Navbar setShowModal={openModal} setLogout={handleUserLogout} />
+          )}
           <Modal
             isOpen={showModal}
             onClose={closeModal}
@@ -106,28 +164,52 @@ function App() {
             />
           </Modal>
         </div>
+
         <Routes>
-          <Route path="/" element={<ShowPage />} />
           <Route
-            path="/dashboard"
-            element={
-              <HomePage
-                onEditWorkout={handleEditWorkout}
-                onUpdateWorkout={handleUpdateWorkout}
-                totalWorkouts={totalWorkouts}
-                weeklyAverage={weeklyAverage}
-                workouts={workouts}
-                onDeleteWorkout={handleDeleteWorkout}
-                onUndoDelete={handleUndoDelete}
-                deletedTimeoutId={deletedTimeoutId}
-              />
-            }
+            path="/"
+            element={<ShowPage onUserLogin={handleUserLogin} />}
           />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/personal-bests" element={<PersonalBestsPage />} />
-          <Route path="/goals" element={<GoalsPage />} />
+          {isLoggedIn && (
+            <>
+              <Route
+                isLoggedIn={isLoggedIn}
+                path="dashboard"
+                element={
+                  <HomePage
+                    onEditWorkout={handleEditWorkout}
+                    onUpdateWorkout={handleUpdateWorkout}
+                    totalWorkouts={totalWorkouts}
+                    weeklyAverage={weeklyAverage}
+                    workouts={workouts}
+                    onDeleteWorkout={handleDeleteWorkout}
+                    onUndoDelete={handleUndoDelete}
+                    deletedTimeoutId={deletedTimeoutId}
+                    mainGoals={mainGoals}
+                  />
+                }
+              />
+              <Route
+                isLoggedIn={isLoggedIn}
+                path="calendar"
+                element={<CalendarPage />}
+              />
+              <Route
+                isLoggedIn={isLoggedIn}
+                path="personal-bests"
+                element={<PersonalBestsPage />}
+              />
+              <Route
+                isLoggedIn={isLoggedIn}
+                path="goals"
+                element={<GoalsPage />}
+              />
+            </>
+          )}
           {/* <Route path = "/workout/:date" element={<WorkoutPage/>} */}
         </Routes>
+
+        
       </Router>
     </>
   );

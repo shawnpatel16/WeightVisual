@@ -17,7 +17,7 @@ const loginController = asyncHandler(async (req, res) => {
   const { email, password } = await loginSchema.validateAsync(req.body);
 
   // Check if the user exists
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: { email },
   });
 
@@ -31,11 +31,17 @@ const loginController = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Invalid email or password" });
   }
-
+  console.log(user.userId)
+   const token = jwt.sign({ id: user.userId, email: user.email }, process.env.JWT_SECRET, {
+     expiresIn: "1h",
+   });
   // Generate a JWT
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+  maxAge: 60 * 60 * 1000, // 1 hour
+  sameSite: "lax", // Prevent CSRF attacks
+});
 
   // Send the JWT in the response
   res.status(200).json({ token });

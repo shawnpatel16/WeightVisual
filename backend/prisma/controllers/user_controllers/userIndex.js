@@ -1,7 +1,11 @@
-const loginController = require('./loginController')
+const loginController = require("./loginController");
 const registerController = require("./registerController");
+const isAuthenticated = require("./isAuthenticated");
+const logoutController = require("./logoutController")
 
 module.exports = {
-    loginController,
-    registerController
-}
+  loginController,
+  registerController,
+  isAuthenticated,
+  logoutController
+};

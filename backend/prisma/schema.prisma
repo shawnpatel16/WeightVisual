@@ -28,6 +28,7 @@ model Exercises {
 
 model Goals {
   goalId   Int        @id @default(autoincrement())
+  createdAt DateTime @default(now())
   title    String?    @db.VarChar(255)
   completed Boolean?  @default(false)
   userId   Int?
@@ -37,6 +38,7 @@ model Goals {
 
 model Subgoals {
   subgoalId   Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
   description String?  @db.VarChar(255)
   completed   Boolean?
   goalId      Int?
@@ -45,7 +47,6 @@ model Subgoals {
 
 model Users {
   userId    Int        @id @default(autoincrement())
-  username  String     @db.VarChar(255)
   password  String     @db.VarChar(255)
   email     String     @unique @db.VarChar(255)
   goals     Goals[]

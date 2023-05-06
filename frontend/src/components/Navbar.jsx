@@ -10,7 +10,7 @@ import {FaCalendarAlt} from 'react-icons/fa'
 import Modal from "./Modal";
 import React from "react";
 import WorkoutForm from "./WorkoutForm";
-const Navbar = ({setShowModal}) => {
+const Navbar = ({setShowModal, setLogout}) => {
   
     
   return (
@@ -21,7 +21,7 @@ const Navbar = ({setShowModal}) => {
          bg-primary text-white"
       >
         <div>
-          <SideBarIcon icon={<IoIosHome size="28" />} text="Home" link="/" />
+          <SideBarIcon icon={<IoIosHome size="28" />} text="Home" link="/dashboard" />
           <SideBarIcon
             icon={<FaCalendarAlt size="28" />}
             text="Calendar View"
@@ -52,8 +52,9 @@ const Navbar = ({setShowModal}) => {
           />
           <SideBarIcon
             icon={<IoPersonCircleSharp size="28" />}
-            text="Profile"
-            link="/calendar"
+            text="Logout"
+            link="/"
+            onClick = {setLogout}
           />
         </div>
       </div>

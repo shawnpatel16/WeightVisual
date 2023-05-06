@@ -15,8 +15,8 @@ const getWeeklyAverageWorkouts = async (userId) => {
   try {
     // Find the oldest workout
     const oldestWorkout = await prisma.workouts.findFirst({
-      where: { userId },
-      orderBy: { createdAt: 'asc' },
+      where: { userId: userId },
+      orderBy: { date: 'asc' },
     });
 
     if (!oldestWorkout) {
@@ -41,10 +41,10 @@ const getWeeklyAverageWorkouts = async (userId) => {
 const getAllWorkouts = async (userId, page, limit) => {
   try {
     const workouts = await prisma.workouts.findMany({
-      where: { userId },
+      where: { userId: userId },
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
 
     return workouts;
@@ -59,7 +59,7 @@ const getTopThreeGoals = async (userId) => {
     const goals = await prisma.goals.findMany({
       where: { userId },
       take: 3,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
 
     return goals;
@@ -85,7 +85,7 @@ const getWorkoutsSummary = asyncHandler(async (req, res) => {
       topThreeGoals
     };
 
-    res.status(200).json(dashboardData);
+  res.status(200).json({ dashboardData });
 })
  
 module.exports = getWorkoutsSummary

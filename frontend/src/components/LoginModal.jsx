@@ -13,18 +13,15 @@ const LoginSchema = Yup.object().shape({
 });
 
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, login}) => {
   const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("/api/auth/login", values);
+      const response = await axios.post("/api/signin/login", values);
       // Check if the response is successful and contains a token
-      if (response.status === 200 && response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.token}`;
-        // Navigate to the dashboard or perform any other action after successful login
+      if (response.status === 200) {
+      
+        login()
         navigate("/dashboard");
       }
     } catch (error) {
@@ -36,28 +33,43 @@ const LoginModal = ({ isOpen, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Login">
       <Formik
-        initialValues={{ email: "", password: ""}}
+        initialValues={{ email: "", password: "" }}
         validationSchema={LoginSchema}
         onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
-          <Form>
-            <div className="text-white">
-              <div>
-                <label htmlFor="email">Email</label>
-                <Field type="email" name="email" />
-                <ErrorMessage name="email" component="div" />
-              </div>
-              <div>
-                <label htmlFor="password">Password</label>
-                <Field type="password" name="password" />
-                <ErrorMessage name="password" component="div" />
-              </div>
-              
-              <button type="submit" disabled={isSubmitting}>
-                Login
-              </button>
+          <Form className="space-y-6 goals-form">
+            <div className="space-y-4">
+              <label htmlFor="email" className="text-lg text-white">
+                Email
+              </label>
+              <Field
+                type="email"
+                name="email"
+                className="w-full rounded long-term-goal-input"
+              />
+              <ErrorMessage name="email" component="div" />
             </div>
+
+            <div className="space-y-4">
+              <label htmlFor="password" className="text-lg text-white">
+                Password
+              </label>
+              <Field
+                type="password"
+                name="password"
+                className="w-full rounded long-term-goal-input"
+              />
+              <ErrorMessage name="password" component="div" />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="submit-button"
+            >
+              Login
+            </button>
           </Form>
         )}
       </Formik>

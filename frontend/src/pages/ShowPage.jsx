@@ -4,7 +4,7 @@ import RegisterModal from "../components/RegisterModal";
 
 
 
-const ShowPage = () => {
+const ShowPage = ({onUserLogin}) => {
     const [isRegisterModalOpen, setOpenRegister] = useState(false);
     const [isLoginModalOpen, setOpenLogin] = useState(false);
 
@@ -24,14 +24,21 @@ const ShowPage = () => {
       setOpenLogin(false);
     };
   return (
-    <div className='pl-24'>
+    <div className="pl-24">
       <h1>Show Page</h1>
       <button onClick={openRegisterModal}>Register</button>
       <button onClick={openLoginModal}>Login</button>
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        login={onUserLogin}
+        
+      />
       <RegisterModal
         isOpen={isRegisterModalOpen}
         onClose={closeRegisterModal}
+        login={onUserLogin}
+        
       />
     </div>
   );

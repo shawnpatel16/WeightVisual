@@ -17,12 +17,14 @@ const registerController = asyncHandler(async (req, res) => {
   const { email, password } = await registerSchema.validateAsync(req.body);
 
   // Check if the email is already in use
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.users.findUnique({
     where: { email },
   });
 
   if (existingUser) {
+    console.log("user exists")
     return res.status(400).json({ message: "Email is already in use" });
+
   }
 
   // Salt and hash the password
@@ -35,12 +37,19 @@ const registerController = asyncHandler(async (req, res) => {
   });
 
   // Generate a JWT
-  const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+ const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
+   expiresIn: "1h",
+ });
 
-  // Send the JWT in the response
-  res.status(201).json({ token });
+ // Set the JWT as an HTTP-only cookie
+ res.cookie("token", token, {
+   httpOnly: true,
+   secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+   maxAge: 60 * 60 * 1000, // 1 hour
+   sameSite: "lax", // Prevent CSRF attacks
+ });
+ res.status(200).json({ message: "Logged in" });
+
 });
 
 module.exports = registerController;

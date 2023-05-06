@@ -1,7 +1,7 @@
 import React, {useState,useEffect} from 'react'
 import axios
   from 'axios';
-const GoalsDashboardComponent = ({ className }) => {
+const GoalsDashboardComponent = ({ className, mainGoals }) => {
   const [goals,setGoals] = useState([])
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +22,7 @@ const GoalsDashboardComponent = ({ className }) => {
       <div className="flex flex-grow items-center justify-center">
         <span className="text-4xl font-semibold text-secondary">
           <ul className="space-y-2">
-            {goals.map((goal, index) => (
+            {mainGoals.map((goal, index) => (
               <li key={index} className="text-secondary">
                 {goal.title}
               </li>
