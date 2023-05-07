@@ -9,7 +9,8 @@ const HomePage = ({
   onEditWorkout,
   totalWorkouts,
   weeklyAverage,
-  workouts,
+  allWorkouts,
+  paginatedWorkouts,
   onUpdateWorkout,
   onDeleteWorkout,
   onUndoDelete,
@@ -34,12 +35,12 @@ const HomePage = ({
           </div>
         </div>
         <div className="col-span-1 lg:col-span-1">
-          <Heatmap workouts={workouts} className="mx-4 text-secondary" />
+          <Heatmap allWorkouts={allWorkouts} className="mx-4 text-secondary" />
         </div>
       </div>
       <div className="mt-8 bg-gray-700 rounded-xl shadow-md p-6">
         <WorkoutHistory
-          workouts={workouts}
+          
           onDelete={onDeleteWorkout}
           onUndoDelete={onUndoDelete}
           deletedTimeoutId={deletedTimeoutId}

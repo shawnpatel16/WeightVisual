@@ -9,7 +9,7 @@ const jwtOptions = {
 };
 
 const jwtVerify = async (jwtPayload, done) => {
-  console.log("JWT Payload:", jwtPayload);
+  
   try {
     const user = await prisma.users.findUnique({
       where: { userId: jwtPayload.id },

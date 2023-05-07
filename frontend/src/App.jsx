@@ -30,7 +30,8 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [totalWorkouts, setTotalWorkouts] = useState(0);
   const [weeklyAverage, setWeeklyAverage] = useState(0);
-  const [workouts, setWorkouts] = useState([]);
+  const [paginatedWorkouts, setPaginatedWorkouts] = useState([]);
+  const [allWorkouts, setAllWorkouts] = useState([])
   const [deletedTimeoutId, setDeletedTimeoutId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mainGoals, setMainGoals] = useState([])
@@ -86,13 +87,14 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get("/api/workout");
+      const response = await axios.get("/api/workout/");
       const data = response.data;
       console.log(data)
       setTotalWorkouts(data.dashboardData.totalWorkouts);
       setWeeklyAverage(data.dashboardData.weeklyAverageWorkouts);
-      setWorkouts(data.dashboardData.allWorkouts);
+      setAllWorkouts(data.dashboardData.allWorkouts);
       setMainGoals(data.dashboardData.topThreeGoals)
+      setPaginatedWorkouts(data.dashboardData.paginatedWorkouts)
     };
 
     if(isLoggedIn) {
@@ -181,7 +183,8 @@ function App() {
                     onUpdateWorkout={handleUpdateWorkout}
                     totalWorkouts={totalWorkouts}
                     weeklyAverage={weeklyAverage}
-                    workouts={workouts}
+                    allWorkouts={allWorkouts}
+                    
                     onDeleteWorkout={handleDeleteWorkout}
                     onUndoDelete={handleUndoDelete}
                     deletedTimeoutId={deletedTimeoutId}
@@ -206,7 +209,7 @@ function App() {
               />
             </>
           )}
-          {/* <Route path = "/workout/:date" element={<WorkoutPage/>} */}
+      
         </Routes>
 
         

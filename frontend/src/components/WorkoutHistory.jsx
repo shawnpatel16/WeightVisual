@@ -1,5 +1,6 @@
-import React, {useState} from 'react'
-import mockData from '../data'
+import React, {useState, useEffect} from 'react'
+import ReactPaginate from "react-paginate";
+import axios from 'axios'
 import Workout from './Workout'
 import WorkoutDetails from './WorkoutDetails'
 import Modal from './Modal'
@@ -7,12 +8,14 @@ import Modal from './Modal'
 // It should show the date, how far from the current date, the split,
 // edit and delete buttons
 // Can also include pagination to scroll thru
-const WorkoutHistory = ({ workouts, onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEditWorkout, onUpdateWorkout }) => {
-
+const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEditWorkout, onUpdateWorkout }) => {
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [workouts, setWorkouts] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("dateDesc");
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-const sortedWorkouts = [...workouts].sort((a, b) => {
+  const sortedWorkouts = [...workouts].sort((a, b) => {
   switch (sortCriteria) {
     case "dateDesc":
       return new Date(b.date) - new Date(a.date);
@@ -27,8 +30,24 @@ const sortedWorkouts = [...workouts].sort((a, b) => {
   }
 });
 
+ 
+  useEffect(() => {
+      console.log(pageNumber)
+      const fetchWorkouts = async (pageNumber) => {
+        console.log(pageNumber)
+        const response = await axios.get(`/api/workout?page=${pageNumber}&limit=10`);
+        // Update your workouts state with the new data
+        setWorkouts(response.data.dashboardData.paginatedWorkouts);
+        setTotalPages(response.data.dashboardData.totalPages)
+      };
+      fetchWorkouts(pageNumber);
+    }, [pageNumber]);
+
   const handleWorkoutClick = (workout) => {
+    console.log(workout)
+    
     setSelectedWorkout(workout);
+    console.log(selectedWorkout)
     setIsDetailsModalOpen(true);
   };
 
@@ -36,6 +55,9 @@ const sortedWorkouts = [...workouts].sort((a, b) => {
     setIsDetailsModalOpen(false);
   };
 
+ useEffect(() => {
+   console.log(selectedWorkout);
+ }, [selectedWorkout]);
 
   return (
     <div className="">
@@ -88,6 +110,18 @@ const sortedWorkouts = [...workouts].sort((a, b) => {
           onClose={closeModal}
         />
       )}
+      <ReactPaginate
+        previousLabel={"previous"}
+        nextLabel={"next"}
+        breakLabel={"..."}
+        breakClassName={"break-me"}
+        pageCount={totalPages} // totalPages should be fetched from the API and stored in the state
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={({ selected }) => setPageNumber(selected + 1)} // Update the pageNumber state when a new page is clicked
+        containerClassName={"pagination"}
+        activeClassName={"active"}
+      />
     </div>
   );
 }

@@ -33,7 +33,7 @@ const loginController = asyncHandler(async (req, res) => {
   }
   console.log(user.userId)
    const token = jwt.sign({ id: user.userId, email: user.email }, process.env.JWT_SECRET, {
-     expiresIn: "1h",
+     expiresIn: "6h",
    });
   // Generate a JWT
 res.cookie("token", token, {

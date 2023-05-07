@@ -38,9 +38,11 @@ const Workout = ({ item, onClick,onDelete, onUndoDelete, onEdit, onEditWorkout }
       <td className="">{formattedDate}</td>
       <td className="">{relativeTime}</td>
       <td className="">{item.progressMade ? <FaCheck /> : <FaTimes />}</td>
-      <td className="">{item.split}</td>
+      <td className="">
+        {item.split}
+      </td>
       <td data-testid="edit-button" className="">
-        <MdEdit onClick={(event) => handleEditClick(event,item)} />
+        <MdEdit onClick={(event) => handleEditClick(event, item)} />
       </td>
       <td data-testid="delete-button" className="">
         <MdDeleteForever onClick={handleDeleteClick} />

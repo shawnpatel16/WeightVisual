@@ -5,8 +5,8 @@ import "react-tooltip/dist/react-tooltip.css";
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 
-const WorkoutHeatmap = ({ workouts, className }) => {
-  const workoutData = workouts.map((workout) => {
+const WorkoutHeatmap = ({ allWorkouts, className }) => {
+  const workoutData = allWorkouts.map((workout) => {
     return {date:workout.date, value:1}
   })
   
@@ -60,10 +60,8 @@ const WorkoutHeatmap = ({ workouts, className }) => {
         ]}
         panelColors={{
           0: "#EBEDF0",
-          8: "#7BC96F",
-          4: "#C6E48B",
-          12: "#239A3B",
-          32: "#196127",
+          1: "#239A3B",
+          
         }}
         rectRender={(props, data) => {
           const dateComponents = data.date.split("/");

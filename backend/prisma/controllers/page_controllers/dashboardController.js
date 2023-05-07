@@ -22,31 +22,52 @@ const getWeeklyAverageWorkouts = async (userId) => {
     if (!oldestWorkout) {
       return 0;
     }
-
+    
     // Calculate the weekly average
     const totalWorkouts = await getTotalWorkoutsForUser(userId);
-    const currentDate = new Date();
-    const oldestWorkoutDate = oldestWorkout.createdAt;
-    const duration = moment.duration(moment(currentDate).diff(moment(oldestWorkoutDate)));
-    const weeksPassed = Math.floor(duration.asWeeks());
+    const currentDate = moment.utc(new Date());
+    const oldestWorkoutDate = moment.utc(oldestWorkout.date);
+    
+    const weeksPassed = currentDate.diff(oldestWorkoutDate,'weeks')
+    
     const weeklyAverage = weeksPassed > 0 ? totalWorkouts / weeksPassed : totalWorkouts;
 
-    return weeklyAverage;
+    return parseFloat(weeklyAverage.toFixed(2));
   } catch (error) {
     console.error('Error calculating weekly average workouts:', error);
     throw error;
   }
 };
 
-const getAllWorkouts = async (userId, page, limit) => {
+const getPaginatedWorkouts = async (userId, page, limit) => {
   try {
     const workouts = await prisma.workouts.findMany({
       where: { userId: userId },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { date: "desc" },
+      select: {
+        split: true,
+        date: true,
+        workoutId: true,
+        exercises: {
+          select: {
+            exerciseId: true,
+            exerciseName: true,
+            exerciseSets: {
+              select: {
+                setId: true,
+                weight: true,
+                reps: true,
+                volume: true,
+                date: true,
+              },
+            },
+          },
+        },
+      },
     });
-
+    console.log(workouts)
     return workouts;
   } catch (error) {
     console.error('Error getting all workouts with pagination:', error);
@@ -69,20 +90,37 @@ const getTopThreeGoals = async (userId) => {
   }
 };
 
-
+const getAllWorkouts = async (userId) => {
+  try {
+    const workouts = await prisma.workouts.findMany({
+    where: { userId: userId },
+    include: { exercises: true },
+    orderBy: { date: "desc" },
+    });
+    return workouts
+  } catch (error) {
+    console.error('Error getting all workouts:', error)
+  }
+}
 
 const getWorkoutsSummary = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
+
   const limit = parseInt(req.query.limit) || 10;
+  
     const totalWorkouts = await getTotalWorkoutsForUser(req.user.id);
     const weeklyAverageWorkouts = await getWeeklyAverageWorkouts(req.user.id);
-    const allWorkouts = await getAllWorkouts(req.user.id, page, limit);
-    const topThreeGoals = await getTopThreeGoals(req.user.id)
+  const paginatedWorkouts = await getPaginatedWorkouts(req.user.id, page, limit);
+  const topThreeGoals = await getTopThreeGoals(req.user.id)
+  const allWorkouts = await getAllWorkouts(req.user.id)
+  const totalPages = Math.ceil(totalWorkouts / 10);
     const dashboardData = {
       totalWorkouts,
       weeklyAverageWorkouts,
+      paginatedWorkouts,
+      topThreeGoals, 
       allWorkouts,
-      topThreeGoals
+      totalPages
     };
 
   res.status(200).json({ dashboardData });

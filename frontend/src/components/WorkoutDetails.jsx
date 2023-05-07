@@ -2,6 +2,12 @@ import React, {useState} from "react";
 import Modal from "./Modal";
 
 const WorkoutDetails = ({ workout, isOpen, onClose }) => {
+  console.log(workout)
+  console.log(workout.split);
+  console.log(workout.date);
+  console.log(workout.exercises);
+  
+  
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Workout Details">
       <div className="text-white">
@@ -14,9 +20,9 @@ const WorkoutDetails = ({ workout, isOpen, onClose }) => {
         <ul className="list-none space-y-1">
           {workout.exercises.map((exercise, index) => (
             <li key={index}>
-              <strong>{exercise.name}</strong>
+              <strong>{exercise.exerciseName}</strong>
               <ul>
-                {exercise.sets.map((set, idx) => (
+                {workout.exercises.map((set, idx) => (
                   <li key={idx}>
                         Set {idx + 1}: {set.weight} lbs x {set.reps} reps
                   </li>
