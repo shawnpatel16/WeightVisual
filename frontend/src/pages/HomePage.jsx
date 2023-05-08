@@ -1,22 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useContext } from "react";
 import Heatmap from '../components/Heatmap'
 import axios from "axios";
 import WorkoutCounter from '../components/WorkoutCounter'
 import WeeklyAverage from '../components/WeeklyAverage'
 import WorkoutHistory from '../components/WorkoutHistory'
 import GoalsDashboardComponent from "../components/GoalsDashboardComponent";
+import { WorkoutContext } from "../context/WorkoutContext";
 const HomePage = ({
   onEditWorkout,
-  totalWorkouts,
-  weeklyAverage,
-  allWorkouts,
-  paginatedWorkouts,
   onUpdateWorkout,
   onDeleteWorkout,
   onUndoDelete,
-  deletedTimeoutId,
-  mainGoals
 }) => {
+  
+  const [paginatedWorkouts, setPaginatedWorkouts] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [workoutToEdit, setWorkoutToEdit] = useState(null);
+  const [deletedTimeoutId, setDeletedTimeoutId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const {
+    workouts,
+    fetchWorkouts,
+    addWorkout,
+    updateWorkout,
+    deleteWorkout,
+    fetchWorkoutByDate,
+    undoDeleteWorkout,
+    totalWorkouts,
+    weeklyAverage,
+    allWorkouts,
+    mainGoals,
+  } = useContext(WorkoutContext);
+
+  useEffect(() => {
+    fetchWorkouts();
+  }, [fetchWorkouts]);
+
+  const handleEditWorkout = (workout) => {
+    setWorkoutToEdit(workout);
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
+  const handleDeleteWorkout = (workoutId) => {
+    const deletedWorkout = workouts.find(
+      (workout) => workout._id === workoutId
+    );
+    setWorkouts(workouts.filter((workout) => workout._id !== workoutId));
+
+    const deleteWorkout = async () => {
+      const response = await axios.delete(`/api/workout/${workoutId}`);
+    };
+
+    const timeoutId = setTimeout(() => {
+      deleteWorkout();
+    }, 5000); // Delay the deletion request by 5 seconds
+
+    setDeletedTimeoutId(timeoutId);
+    return { timeoutId, deletedWorkout };
+  };
+  const handleUndoDelete = (deletedWorkout) => {
+    setWorkouts((prevWorkouts) => [...prevWorkouts, deletedWorkout]);
+  };
+
+  const handleUpdateWorkout = (updatedWorkout) => {
+    const updatedWorkouts = workouts.map((workout) =>
+      workout._id === updatedWorkout._id ? updatedWorkout : workout
+    );
+
+    setWorkouts(updatedWorkouts);
+  };
   return (
     <div className="pl-24">
       <h1 className="text-4xl font-bold mt-10 mb-6 ml-4">Dashboard</h1>
@@ -40,7 +93,6 @@ const HomePage = ({
       </div>
       <div className="mt-8 bg-gray-700 rounded-xl shadow-md p-6">
         <WorkoutHistory
-          
           onDelete={onDeleteWorkout}
           onUndoDelete={onUndoDelete}
           deletedTimeoutId={deletedTimeoutId}

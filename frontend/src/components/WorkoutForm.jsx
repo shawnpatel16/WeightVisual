@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import {
   Formik,
   Form,
@@ -15,6 +15,7 @@ import "./workoutForm.css";
 import { toast } from "react-toastify";
 import axios from "axios";
 import * as Yup from "yup";
+import { WorkoutContext } from "../context/WorkoutContext";
 const suggestedExercises = {
   "Upper Body": [
     "Bench Press",
@@ -164,14 +165,16 @@ const WorkoutForm = ({
   date,
   workoutToEdit,
   isEditing,
-  onUpdateWorkout,
 }) => {
+  console.log(workoutToEdit)
+  const { addWorkout, updateWorkout } = useContext(WorkoutContext);
   const [suggestions, setSuggestions] = useState([]);
-  const getSuggestions = (value, splitName) => {
+  const getSuggestions = (value, split) => {
+    
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
     
-    const splitExercises = suggestedExercises[splitName] || [];
+    const splitExercises = suggestedExercises[split] || [];
     
     return inputLength === 0
       ? []
@@ -181,6 +184,7 @@ const WorkoutForm = ({
         );
   };
   const onSuggestionsFetchRequested = ({ value }, splitName) => {
+    
     setSuggestions(getSuggestions(value, splitName));
   };
 
@@ -192,19 +196,15 @@ const WorkoutForm = ({
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      let response;
       if (isEditing) {
-        
-        response = await axios.put(`/api/workout/${workoutToEdit._id}`, values);
-        onUpdateWorkout(response.data.updatedWorkout);
-        
+        await updateWorkout(workoutToEdit._id, values); 
       } else {
-        response = await axios.post("api/workout/", values);
+        await addWorkout(values);
       }
       
-      // ... handle successful form submission
+    
     } catch (error) {
-      // ... handle form submission errors
+      
     } finally {
       setSubmitting(false);
       toast.success(
@@ -215,7 +215,7 @@ const WorkoutForm = ({
       closeModal();
     }
   };
-
+  
   return (
     <Formik
       initialValues={{
@@ -274,10 +274,7 @@ const WorkoutForm = ({
                           suggestions={suggestions}
                           theme={{ container: "autosuggest-container" }}
                           onSuggestionsFetchRequested={({ value }) =>
-                            onSuggestionsFetchRequested(
-                              { value },
-                              values.splitName
-                            )
+                            onSuggestionsFetchRequested({ value }, values.split)
                           }
                           onSuggestionsClearRequested={
                             onSuggestionsClearRequested
@@ -289,7 +286,7 @@ const WorkoutForm = ({
                           inputProps={{
                             type: "text",
                             name: `exercises.${index}.name`,
-                            value: exercise.name,
+                            value: exercise.exerciseName || "",
                             onChange: (event, { newValue }) => {
                               setFieldValue(
                                 `exercises.${index}.name`,
@@ -316,52 +313,55 @@ const WorkoutForm = ({
                         </button>
                       </div>
                       <div className="ml-4">
-                        <FieldArray name={`exercises.${index}.sets`}>
+                        <FieldArray name={`exercises.${index}.exerciseSets`}>
                           {({ remove: removeSet, push: pushSet }) => (
                             <>
-                              {exercise.sets.map((set, setIndex) => (
-                                <div
-                                  key={setIndex}
-                                  className="flex items-center space-x-4 set-wrapper"
-                                >
-                                  <span className="set-label">
-                                    Set {setIndex + 1}
-                                  </span>
-                                  <label
-                                    htmlFor={`exercises.${index}.sets.${setIndex}.weight`}
-                                    className="weight-label"
+                              {values.exercises.map((exercise, exerciseIndex) =>
+                                exercise.exerciseSets.map((set, setIndex) => (
+                                  <div
+                                    key={setIndex}
+                                    className="flex items-center space-x-4 set-wrapper"
                                   >
-                                    Weight
-                                  </label>
-                                  <input
-                                    type="number"
-                                    name={`exercises.${index}.sets.${setIndex}.weight`}
-                                    value={set.weight}
-                                    onChange={handleChange}
-                                    className="w-20 weight-input"
-                                  />
-                                  <label
-                                    htmlFor={`exercises.${index}.sets.${setIndex}.reps`}
-                                    className="reps-label"
-                                  >
-                                    Reps
-                                  </label>
-                                  <input
-                                    type="number"
-                                    name={`exercises.${index}.sets.${setIndex}.reps`}
-                                    value={set.reps}
-                                    onChange={handleChange}
-                                    className="w-20 reps-input"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => removeSet(setIndex)}
-                                    className="text-red-600 delete-set-btn"
-                                  >
-                                    <FiTrash2 />
-                                  </button>
-                                </div>
-                              ))}
+                                    <span className="set-label">
+                                      Set {setIndex + 1}
+                                    </span>
+                                    <label
+                                      htmlFor={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.weight`}
+                                      className="weight-label"
+                                    >
+                                      Weight
+                                    </label>
+                                    <input
+                                      type="number"
+                                      name={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.weight`}
+                                      value={set.weight}
+                                      onChange={handleChange}
+                                      className="w-20 weight-input"
+                                    />
+                                    <label
+                                      htmlFor={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.reps`}
+                                      className="reps-label"
+                                    >
+                                      Reps
+                                    </label>
+                                    <input
+                                      type="number"
+                                      name={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.reps`}
+                                      value={set.reps}
+                                      onChange={handleChange}
+                                      className="w-20 reps-input"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeSet(setIndex)}
+                                      className="text-red-600 delete-set-btn"
+                                    >
+                                      <FiTrash2 />
+                                    </button>
+                                  </div>
+                                ))
+                              )}
+
                               <button
                                 type="button"
                                 onClick={() =>

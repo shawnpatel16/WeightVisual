@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { BsCalendarPlusFill } from "react-icons/bs";
 import { VscGraphLine } from "react-icons/vsc";
 import { MdDarkMode } from "react-icons/md";
@@ -10,8 +10,22 @@ import {FaCalendarAlt} from 'react-icons/fa'
 import Modal from "./Modal";
 import React from "react";
 import WorkoutForm from "./WorkoutForm";
-const Navbar = ({setShowModal, setLogout}) => {
-  
+import useWorkouts from "../hooks/useWorkouts";
+import moment from "moment";
+import { WorkoutContext } from "../context/WorkoutContext";
+const Navbar = ({setLogout}) => {
+  const [showModal, setShowModal] = useState(false);
+  const { workoutToEdit, isEditing } = useContext(WorkoutContext);
+
+  const currDate = new Date();
+  const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
     
   return (
     <>
@@ -21,7 +35,11 @@ const Navbar = ({setShowModal, setLogout}) => {
          bg-primary text-white"
       >
         <div>
-          <SideBarIcon icon={<IoIosHome size="28" />} text="Home" link="/dashboard" />
+          <SideBarIcon
+            icon={<IoIosHome size="28" />}
+            text="Home"
+            link="/dashboard"
+          />
           <SideBarIcon
             icon={<FaCalendarAlt size="28" />}
             text="Calendar View"
@@ -32,7 +50,19 @@ const Navbar = ({setShowModal, setLogout}) => {
             text="Add daily workout"
             onClick={() => setShowModal(true)}
           />
-          
+          <Modal
+            isOpen={showModal}
+            onClose={closeModal}
+            title={`Add/Edit Workout: ${formattedDate}`}
+          >
+            <WorkoutForm
+              closeModal={closeModal}
+              date={new Date()}
+              workoutToEdit={workoutToEdit}
+              isEditing={isEditing}
+            />
+          </Modal>
+
           <SideBarIcon
             icon={<VscGraphLine size="28" />}
             text="View Progress"
@@ -54,7 +84,7 @@ const Navbar = ({setShowModal, setLogout}) => {
             icon={<IoPersonCircleSharp size="28" />}
             text="Logout"
             link="/"
-            onClick = {setLogout}
+            onClick={setLogout}
           />
         </div>
       </div>

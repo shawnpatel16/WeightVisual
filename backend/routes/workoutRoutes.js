@@ -9,6 +9,7 @@ const {
   deleteWorkout,
   getWorkout,
   getWorkouts,
+  getWorkoutByDate
 } = require("../prisma/controllers/workout_CRUD/workoutCRUDIndex");
 
 
@@ -26,6 +27,7 @@ router.delete("goal/:id", deleteGoal);
 
 //getting individual workout data
 router.get("/:id", getWorkout);
+router.get("/date/:date",getWorkoutByDate)
 router.post("/", createWorkout);
 router.put("/:id",updateWorkout)
 router.delete("/:id", deleteWorkout);

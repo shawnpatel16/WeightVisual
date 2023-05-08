@@ -44,10 +44,10 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
     }, [pageNumber]);
 
   const handleWorkoutClick = (workout) => {
-    console.log(workout)
+    
     
     setSelectedWorkout(workout);
-    console.log(selectedWorkout)
+    
     setIsDetailsModalOpen(true);
   };
 
@@ -55,9 +55,7 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
     setIsDetailsModalOpen(false);
   };
 
- useEffect(() => {
-   console.log(selectedWorkout);
- }, [selectedWorkout]);
+
 
   return (
     <div className="">
@@ -108,6 +106,12 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
           workout={selectedWorkout}
           isOpen={isDetailsModalOpen}
           onClose={closeModal}
+          onDelete={onDelete}
+          onUndoDelete={onUndoDelete}
+          deletedTimeoutId={deletedTimeoutId}
+          onEdit={onEdit}
+          onEditWorkout={onEditWorkout}
+          onUpdateWorkout={onUpdateWorkout}
         />
       )}
       <ReactPaginate

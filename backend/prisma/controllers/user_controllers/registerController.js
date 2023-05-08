@@ -38,7 +38,7 @@ const registerController = asyncHandler(async (req, res) => {
 
   // Generate a JWT
  const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-   expiresIn: "6h",
+   expiresIn: "12h",
  });
 
  // Set the JWT as an HTTP-only cookie
