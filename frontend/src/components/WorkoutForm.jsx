@@ -166,7 +166,6 @@ const WorkoutForm = ({
   workoutToEdit,
   isEditing,
 }) => {
-  console.log(workoutToEdit)
   const { addWorkout, updateWorkout } = useContext(WorkoutContext);
   const [suggestions, setSuggestions] = useState([]);
   const getSuggestions = (value, split) => {
@@ -197,7 +196,7 @@ const WorkoutForm = ({
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       if (isEditing) {
-        await updateWorkout(workoutToEdit._id, values); 
+        await updateWorkout(workoutToEdit.workoutId, values); 
       } else {
         await addWorkout(values);
       }
@@ -236,14 +235,7 @@ const WorkoutForm = ({
       onSubmit={handleSubmit}
     >
       {({ values, handleChange, setFieldValue }) => {
-        console.log(values.exercises[0].exerciseSets);
-        {
-          values.exercises.map((exercise, exerciseIndex) =>
-            exercise.exerciseSets.map((set, setIndex) => (
-              console.log(set.weight)
-              
-            )))
-        }
+        
         return (
           <Form className="space-y-6 workout-form">
             <div className="flex flex-wrap items-center space-x-4 split-name-wrapper">
@@ -284,7 +276,7 @@ const WorkoutForm = ({
                       <div className="flex items-center space-x-4  exercise-row">
                         <label
                           className="exercise-name-label"
-                          htmlFor={`exercises.${index}.name`}
+                          htmlFor={`exercises.${index}.exerciseName`}
                         >
                           Exercise {index + 1}
                         </label>
@@ -303,11 +295,11 @@ const WorkoutForm = ({
                           )}
                           inputProps={{
                             type: "text",
-                            name: `exercises.${index}.name`,
+                            name: `exercises.${index}.exerciseName`,
                             value: exercise.exerciseName || "",
                             onChange: (event, { newValue }) => {
                               setFieldValue(
-                                `exercises.${index}.name`,
+                                `exercises.${index}.exerciseName`,
                                 newValue
                               );
                             },
@@ -334,7 +326,6 @@ const WorkoutForm = ({
                         <FieldArray name={`exercises.${index}.exerciseSets`}>
                           {({ remove: removeSet, push: pushSet }) => (
                             <>
-                              
                               {exercise.exerciseSets.map((set, setIndex) => (
                                 <div
                                   key={setIndex}
@@ -400,7 +391,7 @@ const WorkoutForm = ({
                   <div className="flex items-center add-exercise-wrapper">
                     <button
                       type="button"
-                      onClick={() => push({ name: "", sets: [] })}
+                      onClick={() => push({ exerciseName: "", exerciseSets: [], exerciseProgressMade: false })}
                       className="add-exercise-btn"
                     >
                       <AiOutlinePlus />

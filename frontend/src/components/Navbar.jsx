@@ -13,7 +13,7 @@ import WorkoutForm from "./WorkoutForm";
 import useWorkouts from "../hooks/useWorkouts";
 import moment from "moment";
 import { WorkoutContext } from "../context/WorkoutContext";
-const Navbar = ({setLogout}) => {
+const Navbar = ({onWorkoutButtonClick, setLogout}) => {
   const [showModal, setShowModal] = useState(false);
   const {
     workoutToEdit,
@@ -57,7 +57,7 @@ const Navbar = ({setLogout}) => {
           <SideBarIcon
             icon={<BsCalendarPlusFill size="28" />}
             text="Add daily workout"
-            onClick={() => setShowModal(true)}
+            onClick={onWorkoutButtonClick}
           />
 
           <SideBarIcon

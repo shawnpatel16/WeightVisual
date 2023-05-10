@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import mockData from "./data";
 import moment from "moment";
+import WorkoutDetails from "./components/WorkoutDetails";
 import { WorkoutProvider } from "./context/WorkoutContext";
 import {
   BrowserRouter as Router,
@@ -27,10 +28,14 @@ import { DateLocalizer } from "react-big-calendar";
 import { WorkoutContext } from "./context/WorkoutContext";
 import ShowPage from "./pages/ShowPage";
 function App() {
+  const { workoutsUpdated, setWorkoutsUpdated,editWorkout,isEditing } = useContext(WorkoutContext);
   const [showModal, setShowModal] = useState(false);
-
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [workout, setWorkout] = useState(null);
+  const [isEditFormModalOpen, setIsEditFormModalOpen] = useState(false)
+  const currDate = new Date();
+  const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
   const handleUserLogin = () => {
     setIsLoggedIn(true);
   };
@@ -52,6 +57,38 @@ function App() {
     }
   };
 
+const openFormModalForEditing = (workout) => {
+  editWorkout(workout);
+  setIsEditFormModalOpen(true);
+};
+  const openDetailsModal = () => {
+    setShowDetailsModal(true);
+  };
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+  };
+
+  const handleWorkoutButtonClick = async () => {
+    try {
+      const isoDate = new Date().toISOString();
+      const response = await axios.get(`/api/workout/date/${isoDate}`);
+      const fetchedWorkout = response.data.workout;
+
+      if (fetchedWorkout) {
+        setWorkout(fetchedWorkout);
+        
+      } else {
+        setWorkout(null);
+      }
+      openModal();
+    } catch (error) {
+      console.error("Error fetching workout by date:", error);
+    }
+  };
+
+
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -72,8 +109,7 @@ function App() {
     checkAuth();
   }, []);
 
-  const currDate = new Date();
-  const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
+
 
   const openModal = () => {
     setShowModal(true);
@@ -90,19 +126,41 @@ function App() {
         <Router>
           <div className="flex">
             {isLoggedIn && (
-              <Navbar setShowModal={openModal} setLogout={handleUserLogout} />
+              <Navbar
+                onWorkoutButtonClick={handleWorkoutButtonClick}
+                setLogout={handleUserLogout}
+              />
             )}
             <Modal
               isOpen={showModal}
               onClose={closeModal}
-              title={`Add/Edit Workout: ${formattedDate}`}
+              title={`Workout: ${formattedDate}`}
             >
-              <WorkoutForm
-                closeModal={closeModal}
-                date={new Date()}
-                
-              />
+              {workout ? (
+                <WorkoutDetails
+                  workout={workout}
+                  isOpen={showModal}
+                  onEditWorkout={openFormModalForEditing}
+                  onClose={closeModal}
+                  date={new Date()}
+                />
+              ) : (
+                <WorkoutForm closeModal={closeModal} date={new Date()} />
+              )}
             </Modal>
+            {isEditFormModalOpen && (
+              <Modal
+                isOpen={isEditFormModalOpen}
+                onClose={() => setIsEditFormModalOpen(false)}
+              >
+                <WorkoutForm
+                  closeModal={() => setIsEditFormModalOpen(false)}
+                  date={isEditing ? workout.date : new Date()}
+                  workoutToEdit={workout}
+                  isEditing={isEditing}
+                />
+              </Modal>
+            )}
           </div>
 
           <Routes>

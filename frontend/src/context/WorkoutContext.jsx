@@ -34,17 +34,20 @@ export const WorkoutProvider = ({ children }) => {
 
 
   const addWorkout = useCallback(async (workout) => {
+    console.log(workout)
     try {
       const response = await axios.post("/api/workout/", workout);
       const newWorkout = response.data;
       // Add the new workout to the context state
       setAllWorkouts([...allWorkouts, newWorkout]);
+      setWorkoutsUpdated(!workoutsUpdated)
     } catch (error) {
       console.error("Error adding workout:", error);
     }
   }, [allWorkouts]);
 
   const updateWorkout = useCallback(async (workoutId, updatedWorkout) => {
+
     try {
       const response = await axios.put(
         `/api/workout/${workoutId}`,
@@ -57,6 +60,7 @@ export const WorkoutProvider = ({ children }) => {
          workout._id === workoutId ? updatedWorkoutData : workout
        )
      );
+      setWorkoutsUpdated(!workoutsUpdated);
     } catch (error) {
       console.error("Error updating workout:", error);
     }

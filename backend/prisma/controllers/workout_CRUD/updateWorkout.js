@@ -4,26 +4,46 @@ const prisma = require("../../prismaClient");
 
 const updateWorkout = asyncHandler(async (req, res) => {
   const updatedWorkout = await prisma.workouts.update({
-    where: { workoutId: parseInt(req.params.workoutId), userId: req.user.id },
+    where: { workoutId: parseInt(req.params.id), userId: req.user.id },
     data: {
-      title: req.body.title,
+      split: req.body.split,
       date: req.body.date,
+      workoutProgressMade: req.body.workoutProgressMade,
       exercises: {
         upsert: req.body.exercises.map((exercise) => ({
           where: { exerciseId: exercise.exerciseId },
           update: {
-            name: exercise.name,
+            exerciseName: exercise.exerciseName,
+            exerciseProgressMade: exercise.exerciseProgressMade,
             exerciseSets: {
               upsert: exercise.exerciseSets.map((exerciseSet) => ({
                 where: { setId: exerciseSet.setId },
-                update: { weight: exerciseSet.weight, reps: exerciseSet.reps },
-                create: { weight: exerciseSet.weight, reps: exerciseSet.reps },
+                update: {
+                  weight: exerciseSet.weight,
+                  reps: exerciseSet.reps,
+                  volume: exerciseSet.weight * exerciseSet.reps, // Calculate the volume
+                  date: req.body.date, // Set the date for each exercise set
+                },
+                create: {
+                  weight: exerciseSet.weight,
+                  reps: exerciseSet.reps,
+                  volume: exerciseSet.weight * exerciseSet.reps, // Calculate the volume
+                  date: req.body.date, // Set the date for each exercise set
+                },
               })),
             },
           },
           create: {
-            name: exercise.name,
-            exerciseSets: { create: exercise.exerciseSets },
+            exerciseName: exercise.exerciseName,
+            exerciseProgressMade: exercise.exerciseProgressMade,
+            exerciseSets: {
+              create: exercise.exerciseSets.map((exerciseSet) => ({
+                weight: exerciseSet.weight,
+                reps: exerciseSet.reps,
+                volume: exerciseSet.weight * exerciseSet.reps, // Calculate the volume
+                date: req.body.date, // Set the date for each exercise set
+              })),
+            },
           },
         })),
       },
