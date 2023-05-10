@@ -72,7 +72,8 @@ function App() {
     checkAuth();
   }, []);
 
-
+  const currDate = new Date();
+  const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
 
   const openModal = () => {
     setShowModal(true);
@@ -91,7 +92,17 @@ function App() {
             {isLoggedIn && (
               <Navbar setShowModal={openModal} setLogout={handleUserLogout} />
             )}
-            
+            <Modal
+              isOpen={showModal}
+              onClose={closeModal}
+              title={`Add/Edit Workout: ${formattedDate}`}
+            >
+              <WorkoutForm
+                closeModal={closeModal}
+                date={new Date()}
+                
+              />
+            </Modal>
           </div>
 
           <Routes>

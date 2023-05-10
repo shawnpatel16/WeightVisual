@@ -7,14 +7,13 @@ export const WorkoutContext = createContext();
 
 export const WorkoutProvider = ({ children }) => {
   const [workoutToEdit, setWorkoutToEdit] = useState(null);
+  const [workoutsUpdated, setWorkoutsUpdated] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [totalWorkouts, setTotalWorkouts] = useState(0);
   const [weeklyAverage, setWeeklyAverage] = useState(0);
   const [paginatedWorkouts, setPaginatedWorkouts] = useState([]);
   const [allWorkouts, setAllWorkouts] = useState([]);
   const [mainGoals, setMainGoals] = useState([]);
-  const [deletedWorkout, setDeletedWorkout] = useState(null);
-  const [deleteTimeout, setDeleteTimeout] = useState(null);
   const [workoutByDate, setWorkoutByDate] = useState(null)
 
   const fetchWorkouts = useCallback(async () => {
@@ -64,28 +63,23 @@ export const WorkoutProvider = ({ children }) => {
   }, [allWorkouts]);
 
 
- const deleteWorkout = useCallback(
-   (workoutId) => {
-     const workoutToDelete = allWorkouts.find(
-       (workout) => workout._id === workoutId
+ const deleteWorkout = async (id) => {
+   try {
+     console.log(allWorkouts)
+     await axios.delete(`/api/workout/${id}`);
+     setAllWorkouts((prevWorkouts) =>
+       prevWorkouts.filter((workout) => {
+         
+         return workout.workoutId !== id;
+       })
      );
-     setDeletedWorkout(workoutToDelete);
+     console.log(allWorkouts)
+   } catch (error) {
+     console.log(error);
+   }
+ };
 
-     setAllWorkouts(allWorkouts.filter((workout) => workout._id !== workoutId));
 
-     const timeout = setTimeout(async () => {
-       try {
-         await axios.delete(`/api/workout/${workoutId}`);
-       } catch (error) {
-         console.error("Error deleting workout:", error);
-       }
-       setDeletedWorkout(null);
-     }, 5000);
-
-     setDeleteTimeout(timeout);
-   },
-   [allWorkouts]
- );
 
 const fetchWorkoutByDate = useCallback(async (date) => {
   try {
@@ -96,14 +90,7 @@ const fetchWorkoutByDate = useCallback(async (date) => {
     console.error("Error fetching workout by date:", error);
   }
 }, []);
-  const undoDeleteWorkout = useCallback(() => {
-    if (deletedWorkout && deleteTimeout) {
-      clearTimeout(deleteTimeout);
-      setAllWorkouts([...allWorkouts, deletedWorkout]);
-      setDeletedWorkout(null);
-      setDeleteTimeout(null);
-    }
-  }, [allWorkouts, deletedWorkout, deleteTimeout]);
+  
   const editWorkout = (workout) => {
     setWorkoutToEdit(workout);
     setIsEditing(true);
@@ -116,7 +103,6 @@ const fetchWorkoutByDate = useCallback(async (date) => {
         updateWorkout,
         deleteWorkout,
         fetchWorkoutByDate,
-        undoDeleteWorkout,
         totalWorkouts,
         weeklyAverage,
         allWorkouts,
@@ -124,6 +110,8 @@ const fetchWorkoutByDate = useCallback(async (date) => {
         workoutToEdit,
         isEditing,
         editWorkout,
+        workoutsUpdated,
+        setWorkoutsUpdated,
       }}
     >
       {children}

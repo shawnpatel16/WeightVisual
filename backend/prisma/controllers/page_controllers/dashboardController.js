@@ -50,10 +50,12 @@ const getPaginatedWorkouts = async (userId, page, limit) => {
         split: true,
         date: true,
         workoutId: true,
+        workoutProgressMade: true,
         exercises: {
           select: {
             exerciseId: true,
             exerciseName: true,
+            exerciseProgressMade:true,
             exerciseSets: {
               select: {
                 setId: true,

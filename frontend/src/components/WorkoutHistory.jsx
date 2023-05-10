@@ -1,61 +1,91 @@
-import React, {useState, useEffect} from 'react'
+import { WorkoutContext } from "../context/WorkoutContext";
+import React, { useState, useEffect, useContext } from "react";
+import WorkoutForm from "./WorkoutForm";
+
 import ReactPaginate from "react-paginate";
-import axios from 'axios'
-import Workout from './Workout'
-import WorkoutDetails from './WorkoutDetails'
-import Modal from './Modal'
+import axios from "axios";
+import Workout from "./Workout";
+import WorkoutDetails from "./WorkoutDetails";
+import Modal from "./Modal";
 // This can include a list of the past workouts
 // It should show the date, how far from the current date, the split,
 // edit and delete buttons
 // Can also include pagination to scroll thru
-const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEditWorkout, onUpdateWorkout }) => {
+const WorkoutHistory = ({
+  onDelete,
+  onEditWorkout,
+  onUpdateWorkout,
+}) => {
+  const {
+    allWorkouts,
+    updateWorkout,
+    deleteWorkout,
+    editWorkout,
+    workoutToEdit,
+    isEditing,
+    workoutsUpdated,
+    setWorkoutsUpdated,
+  } = useContext(WorkoutContext);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [workouts, setWorkouts] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("dateDesc");
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
   const sortedWorkouts = [...workouts].sort((a, b) => {
-  switch (sortCriteria) {
-    case "dateDesc":
-      return new Date(b.date) - new Date(a.date);
-    case "dateAsc":
-      return new Date(a.date) - new Date(b.date);
-    case "splitAsc":
-      return a.split.localeCompare(b.split);
-    case "splitDesc":
-      return b.split.localeCompare(a.split);
-    default:
-      return 0;
-  }
-});
+    switch (sortCriteria) {
+      case "dateDesc":
+        return new Date(b.date) - new Date(a.date);
+      case "dateAsc":
+        return new Date(a.date) - new Date(b.date);
+      case "splitAsc":
+        return a.split.localeCompare(b.split);
+      case "splitDesc":
+        return b.split.localeCompare(a.split);
+      default:
+        return 0;
+    }
+  });
 
- 
   useEffect(() => {
-      console.log(pageNumber)
-      const fetchWorkouts = async (pageNumber) => {
-        console.log(pageNumber)
-        const response = await axios.get(`/api/workout?page=${pageNumber}&limit=10`);
-        // Update your workouts state with the new data
-        setWorkouts(response.data.dashboardData.paginatedWorkouts);
-        setTotalPages(response.data.dashboardData.totalPages)
-      };
-      fetchWorkouts(pageNumber);
-    }, [pageNumber]);
+    const fetchWorkouts = async (pageNumber) => {
+      const response = await axios.get(
+        `/api/workout?page=${pageNumber}&limit=10`
+      );
+      // Update your workouts state with the new data
+      setWorkouts(response.data.dashboardData.paginatedWorkouts);
+      setTotalPages(response.data.dashboardData.totalPages);
+    };
+    fetchWorkouts(pageNumber);
+  }, [pageNumber, workoutsUpdated]);
 
-  const handleWorkoutClick = (workout) => {
-    
-    
-    setSelectedWorkout(workout);
-    
-    setIsDetailsModalOpen(true);
+
+  const handleDeleteWorkout = (workoutId) => {
+      console.log("calling handle delete workotu")
+      deleteWorkout(workoutId);
+      setWorkoutsUpdated(!workoutsUpdated);
+      setIsDetailsModalOpen(false)
+    };
+
+  const handleWorkoutClick = (workout, isEdit = false) => {
+    if (isEdit) {
+      editWorkout(workout);
+    } else {
+      setSelectedWorkout(workout);
+      setIsDetailsModalOpen(true);
+    }
   };
 
   const closeModal = () => {
     setIsDetailsModalOpen(false);
   };
 
-
+  const openFormModalForEditing = (workout) => {
+    editWorkout(workout);
+    setIsFormModalOpen(true);
+  };
 
   return (
     <div className="">
@@ -91,11 +121,8 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
               key={index}
               item={item}
               onClick={() => handleWorkoutClick(item)}
-              onDelete={onDelete}
-              onUndoDelete={onUndoDelete}
-              deletedTimeoutId={deletedTimeoutId}
-              onEdit={onEdit}
-              onEditWorkout={onEditWorkout}
+              onDelete={handleDeleteWorkout}
+              onEditWorkout={(item) => openFormModalForEditing(item)}
               onUpdateWorkout={onUpdateWorkout}
             />
           ))}
@@ -106,13 +133,23 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
           workout={selectedWorkout}
           isOpen={isDetailsModalOpen}
           onClose={closeModal}
-          onDelete={onDelete}
-          onUndoDelete={onUndoDelete}
-          deletedTimeoutId={deletedTimeoutId}
-          onEdit={onEdit}
-          onEditWorkout={onEditWorkout}
+          onDelete={handleDeleteWorkout}
+          onEditWorkout={openFormModalForEditing}
           onUpdateWorkout={onUpdateWorkout}
         />
+      )}
+      {isFormModalOpen && (
+        <Modal
+          isOpen={isFormModalOpen}
+          onClose={() => setIsFormModalOpen(false)}
+        >
+          <WorkoutForm
+            closeModal={() => setIsFormModalOpen(false)}
+            date={isEditing ? workoutToEdit.date : new Date()}
+            workoutToEdit={workoutToEdit}
+            isEditing={isEditing}
+          />
+        </Modal>
       )}
       <ReactPaginate
         previousLabel={"previous"}
@@ -128,6 +165,6 @@ const WorkoutHistory = ({ onDelete, onUndoDelete, deletedTimeoutId, onEdit, onEd
       />
     </div>
   );
-}
+};
 
-export default WorkoutHistory
+export default WorkoutHistory;

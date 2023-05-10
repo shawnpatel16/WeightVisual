@@ -84,6 +84,7 @@ const WorkoutHeatmap = ({ allWorkouts, className }) => {
             <>
               <rect
                 {...props}
+                
                 data-tooltip-content={`Date: ${formattedDate}`}
                 data-tooltip-id="heatmap-tooltip"
               />

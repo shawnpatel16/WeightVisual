@@ -220,12 +220,30 @@ const WorkoutForm = ({
     <Formik
       initialValues={{
         split: isEditing ? workoutToEdit.split : "",
-        exercises: isEditing ? workoutToEdit.exercises : [],
+        exercises: isEditing
+          ? workoutToEdit.exercises.map((exercise) => ({
+              ...exercise,
+              exerciseSets: exercise.exerciseSets || [],
+              exerciseProgressMade: exercise.exerciseProgressMade || false,
+            }))
+          : [],
         date: isEditing ? workoutToEdit.date : date,
+        
+        workoutProgressMade: isEditing
+          ? workoutToEdit.workoutProgressMade
+          : false,
       }}
       onSubmit={handleSubmit}
     >
       {({ values, handleChange, setFieldValue }) => {
+        console.log(values.exercises[0].exerciseSets);
+        {
+          values.exercises.map((exercise, exerciseIndex) =>
+            exercise.exerciseSets.map((set, setIndex) => (
+              console.log(set.weight)
+              
+            )))
+        }
         return (
           <Form className="space-y-6 workout-form">
             <div className="flex flex-wrap items-center space-x-4 split-name-wrapper">
@@ -252,7 +270,7 @@ const WorkoutForm = ({
             <label className="flex items-center">
               <Field
                 type="checkbox"
-                name="progressMade"
+                name="workoutProgressMade"
                 className="form-checkbox"
               />
               <span className="ml-2">Progress Made</span>
@@ -299,7 +317,7 @@ const WorkoutForm = ({
                         <label className="flex items-center">
                           <Field
                             type="checkbox"
-                            name={`exercises.${index}.progressMade`}
+                            name={`exercises.${index}.exerciseProgressMade`}
                             className="form-checkbox"
                           />
                           <span className="ml-2">Progress Made</span>
@@ -316,51 +334,52 @@ const WorkoutForm = ({
                         <FieldArray name={`exercises.${index}.exerciseSets`}>
                           {({ remove: removeSet, push: pushSet }) => (
                             <>
-                              {values.exercises.map((exercise, exerciseIndex) =>
-                                exercise.exerciseSets.map((set, setIndex) => (
-                                  <div
-                                    key={setIndex}
-                                    className="flex items-center space-x-4 set-wrapper"
+                              
+                              {exercise.exerciseSets.map((set, setIndex) => (
+                                <div
+                                  key={setIndex}
+                                  className="flex items-center space-x-4 set-wrapper"
+                                >
+                                  
+                                  <span className="set-label">
+                                    Set {setIndex + 1}
+                                  </span>
+                                  <label
+                                    htmlFor={`exercises.${index}.exerciseSets.${setIndex}.weight`}
+                                    className="weight-label"
                                   >
-                                    <span className="set-label">
-                                      Set {setIndex + 1}
-                                    </span>
-                                    <label
-                                      htmlFor={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.weight`}
-                                      className="weight-label"
-                                    >
-                                      Weight
-                                    </label>
-                                    <input
-                                      type="number"
-                                      name={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.weight`}
-                                      value={set.weight}
-                                      onChange={handleChange}
-                                      className="w-20 weight-input"
-                                    />
-                                    <label
-                                      htmlFor={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.reps`}
-                                      className="reps-label"
-                                    >
-                                      Reps
-                                    </label>
-                                    <input
-                                      type="number"
-                                      name={`exercises.${exerciseIndex}.exerciseSets.${setIndex}.reps`}
-                                      value={set.reps}
-                                      onChange={handleChange}
-                                      className="w-20 reps-input"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => removeSet(setIndex)}
-                                      className="text-red-600 delete-set-btn"
-                                    >
-                                      <FiTrash2 />
-                                    </button>
-                                  </div>
-                                ))
-                              )}
+                                    Weight
+                                  </label>
+                                  <input
+                                    type="number"
+                                    name={`exercises.${index}.exerciseSets.${setIndex}.weight`}
+                                    value={set.weight}
+                                    onChange={handleChange}
+                                    className="w-20 weight-input"
+                                  />
+                                  <label
+                                    htmlFor={`exercises.${index}.exerciseSets.${setIndex}.reps`}
+                                    className="reps-label"
+                                  >
+                                    Reps
+                                  </label>
+                                  <input
+                                    type="number"
+                                    name={`exercises.${index}.exerciseSets.${setIndex}.reps`}
+                                    value={set.reps}
+                                    onChange={handleChange}
+                                    className="w-20 reps-input"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeSet(setIndex)}
+                                    className="text-red-600 delete-set-btn"
+                                  >
+                                    <FiTrash2 />
+                                  </button>
+                                </div>
+                              ))}
+                             
 
                               <button
                                 type="button"

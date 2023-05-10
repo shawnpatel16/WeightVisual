@@ -1,32 +1,18 @@
 import React, {useState} from "react";
 import Modal from "./Modal";
 import useWorkouts from "../hooks/useWorkouts";
-const WorkoutDetails = ({ workout, isOpen, onClose }) => {
-  const { deleteWorkout, undoDeleteWorkout, editWorkout } = useWorkouts();
+import ConfirmationDialog from "./ConfirmationDialog";
+
+const WorkoutDetails = ({ workout, isOpen, onClose, onDelete, onEditWorkout }) => {
+  const { deleteWorkout, editWorkout } = useWorkouts();
+  
   const handleEditClick = (event, workout) => {
     event.stopPropagation();
     editWorkout(workout);
     onClose()
+    onEditWorkout(workout)
   };
 
-  const handleDeleteClick = (event) => {
-    event.stopPropagation();
-    const { timeoutId, deletedWorkout } = onDelete(workout._id);
-
-    toast(
-      <>
-        Workout deleted.
-        <button onClick={() => handleUndo(timeoutId, deletedWorkout)}>
-          Undo
-        </button>
-      </>
-    );
-  };
-  const handleUndo = (timeoutId, deletedWorkout) => {
-    clearTimeout(timeoutId);
-    onUndoDelete(deletedWorkout);
-  };
-  
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Workout Details">
       <div className="text-white">
@@ -56,12 +42,25 @@ const WorkoutDetails = ({ workout, isOpen, onClose }) => {
         >
           Edit
         </button>
-        <button
+
+        <div>
+          <ConfirmationDialog
+            isDeleteDialogOpen={false} // Pass the initial open state as a prop
+            message="Are you sure you want to delete this workout?"
+            onConfirm={() => onDelete(workout.workoutId)}
+            onCancel={() => {}}
+          >
+            <button className="bg-red-500 px-4 py-2 mt-4 ml-2 rounded text-white">
+              Delete
+            </button>
+          </ConfirmationDialog>
+        </div>
+        {/* <button
           className="bg-red-500 px-4 py-2 mt-4 ml-2 rounded text-white"
           onClick={handleDeleteClick}
         >
           Delete
-        </button>
+        </button> */}
       </div>
     </Modal>
   );

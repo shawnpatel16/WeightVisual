@@ -15,13 +15,22 @@ import moment from "moment";
 import { WorkoutContext } from "../context/WorkoutContext";
 const Navbar = ({setLogout}) => {
   const [showModal, setShowModal] = useState(false);
-  const { workoutToEdit, isEditing } = useContext(WorkoutContext);
+  const {
+    workoutToEdit,
+    isEditing,
+    setWorkoutToEdit,
+    setIsEditing,
+  } = useContext(WorkoutContext);
+
+  const openModal = () => {
+    setWorkoutToEdit(null);
+    setIsEditing(false);
+    setShowModal(true);
+  };
 
   const currDate = new Date();
   const formattedDate = moment(currDate).format("dddd, MMMM Do, YYYY");
-  const openModal = () => {
-    setShowModal(true);
-  };
+  
 
   const closeModal = () => {
     setShowModal(false);
@@ -50,18 +59,6 @@ const Navbar = ({setLogout}) => {
             text="Add daily workout"
             onClick={() => setShowModal(true)}
           />
-          <Modal
-            isOpen={showModal}
-            onClose={closeModal}
-            title={`Add/Edit Workout: ${formattedDate}`}
-          >
-            <WorkoutForm
-              closeModal={closeModal}
-              date={new Date()}
-              workoutToEdit={workoutToEdit}
-              isEditing={isEditing}
-            />
-          </Modal>
 
           <SideBarIcon
             icon={<VscGraphLine size="28" />}
