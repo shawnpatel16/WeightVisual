@@ -145,7 +145,7 @@ const openFormModalForEditing = (workout) => {
                   date={new Date()}
                 />
               ) : (
-                <WorkoutForm closeModal={closeModal} date={new Date()} />
+                <WorkoutForm closeModal={closeModal} date={new Date()}  />
               )}
             </Modal>
             {isEditFormModalOpen && (

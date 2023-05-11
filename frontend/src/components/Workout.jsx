@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 import { MdEdit, MdDeleteForever } from "react-icons/md";
 
 const Workout = ({ item, onClick, onDelete,onEditWorkout }) => {
-  const formattedDate = moment(item.date).format("dddd, MMMM Do, YYYY");
-  const relativeTime = moment(item.date).fromNow();
+  const formattedDate = moment.utc(item.date).format("dddd, MMMM Do, YYYY");
+  const relativeTime = moment.utc(item.date).fromNow();
     
 
 const { deleteWorkout, undoDeleteWorkout } = useContext(WorkoutContext);

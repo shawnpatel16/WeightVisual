@@ -63,7 +63,6 @@ const WorkoutHistory = ({
 
 
   const handleDeleteWorkout = (workoutId) => {
-      console.log("calling handle delete workotu")
       deleteWorkout(workoutId);
       setWorkoutsUpdated(!workoutsUpdated);
       setIsDetailsModalOpen(false)

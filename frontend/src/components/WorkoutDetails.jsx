@@ -12,7 +12,7 @@ const WorkoutDetails = ({ workout, isOpen, onClose, onDelete, onEditWorkout }) =
     onClose()
     onEditWorkout(workout)
   };
-
+  console.log(workout)
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Workout Details">
       <div className="text-white">

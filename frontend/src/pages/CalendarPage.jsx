@@ -1,118 +1,180 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useContext,
+} from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"
+import axios from "axios";
 import WorkoutForm from "../components/WorkoutForm";
+import { WorkoutContext } from "../context/WorkoutContext";
+
 import Modal from "../components/Modal";
-import WorkoutDetails from "../components/WorkoutDetails"
+import WorkoutDetails from "../components/WorkoutDetails";
+import { format } from "date-fns";
+
 const localizer = momentLocalizer(moment);
 
 const CalendarPage = () => {
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [workouts, setWorkouts] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
   const [showWorkoutDetails, setShowWorkoutDetails] = useState(false);
+  const [isEditFormModalOpen, setIsEditFormModalOpen] = useState(false);
 
-    useEffect(() => {
-      const fetchData = async () => {
-        const response = await axios.get("/api/workout/calendar");
-        const data = response.data.workouts;
+  const {
+    allWorkouts,
+    updateWorkout,
+    deleteWorkout,
+    editWorkout,
+    workoutToEdit,
+    isEditing,
+    workoutsUpdated,
+    setWorkoutsUpdated,
+  } = useContext(WorkoutContext);
 
-        const formattedEvents = data.map((workout) => {
-          const startDate = new Date(workout.date);
-          const endDate = new Date(workout.date);
-          endDate.setHours(endDate.getHours() + 1); // Assuming each workout is 1 hour long
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get("/api/workout/calendar");
+      const data = response.data.workouts;
 
-          return {
-            start: startDate,
-            end: endDate,
-            title: `${workout.split} - ${workout.exercises
-              .map((exercise) => exercise.exerciseName)
-              .join(", ")}`,
-            allDay: true,
-            resource: workout, // You can store the entire workout object as a custom field if needed
-          };
-        });
+      const formattedWorkouts = data.map((workout) => {
+        console.log(workout.date)
+        const dateComponents = workout.date.split(/[-T:.Z]/).map(Number);
+        const startDate = new Date(
+          Date.UTC(
+            dateComponents[0],
+            dateComponents[1] - 1,
+            dateComponents[2],
+            23,
+            59,
+            59,
+            999
+          )
+        );
+        const endDate = new Date(
+          Date.UTC(
+            dateComponents[0],
+            dateComponents[1] - 1,
+            dateComponents[2],
+            23,
+            59,
+            59,
+            999
+          )
+        );
 
-        setEvents(formattedEvents);
-      };
+        return {
+          start: startDate,
+          end:endDate,
+          title: `${workout.split}`,
+          allDay: true,
+          resource: workout,
+        };
+      });
+      setWorkouts(formattedWorkouts);
+    };
 
-      fetchData();
-    }, []);
+    fetchData();
+    
+  }, [workoutsUpdated]);
 
-const handleSelectEvent = (event) => {
-  setSelectedEvent(event);
-  setShowWorkoutDetails(true);
-};
+  const handleSelectEvent = (event) => {
+    const workout = event.resource;
+    console.log(workout);
+    setSelectedWorkout(workout);
+    console.log(selectedWorkout);
+    setSelectedDate(new Date(event.start).toISOString());
+    console.log(selectedDate);
+    openModal()
 
-const handleSelectSlot = (slotInfo) => {
-  setSelectedDate(slotInfo.start);
-  setShowWorkoutForm(true);
-};
-
-const closeModal = () => {
-  setShowWorkoutForm(false);
-  setShowWorkoutDetails(false);
-  setSelectedEvent(null);
-  setSelectedDate(null);
-};
-  const updateWorkout = (updatedWorkout) => {
-    const updatedEvents = events.map((event) =>
-      event.resource._id === updatedWorkout._id
-        ? {
-            ...event,
-            start: new Date(updatedWorkout.date),
-            end: new Date(updatedWorkout.date),
-            title: `${updatedWorkout.split} - ${updatedWorkout.exercises
-              .map((exercise) => exercise.exerciseName)
-              .join(", ")}`,
-            resource: updatedWorkout,
-          }
-        : event
-    );
-    setEvents(updatedEvents);
   };
 
- 
+  const handleSelectSlot = (slotInfo) => {
+    const slotStart = slotInfo.start;
+    const formattedDate = moment(slotStart).format("dddd, MMMM Do, YYYY");
+    const slotEnd = slotInfo.end;
+    // Search for an event that matches the clicked slot
+    const matchingEvent = workouts.find(
+      (workout) =>
+        moment(workout.start).format("dddd, MMMM Do, YYYY") === formattedDate
+    );
 
+    // If a matching event was found, handle as event click
+    if (matchingEvent) {
+      handleSelectEvent(matchingEvent);
+    } else {
+      setSelectedDate(new Date(slotInfo.start).toISOString());
+      setSelectedWorkout(null)
+      openModal()
+    }
+  };
+
+  const openFormModalForEditing = (workout) => {
+    editWorkout(workout);
+    setIsEditFormModalOpen(true);
+  };
+
+const handleDeleteWorkout = (workoutId) => {
+  deleteWorkout(workoutId);
+  setWorkoutsUpdated(!workoutsUpdated);
+  closeModal()
+};
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
   return (
     <div className="flex justify-center align-center pt-8">
       <Calendar
-        style={{ height: "90vh", width: "70vw" }}
+        style={{ height: "90vh" }}
         localizer={localizer}
-        events={events}
+        events={workouts}
         onSelectEvent={handleSelectEvent}
         onSelectSlot={handleSelectSlot}
         selectable
         startAccessor="start"
         endAccessor="end"
-        
+        className="w-4/5"
       />
-      {showWorkoutForm && (
+      <Modal
+        isOpen={showModal}
+        onClose={closeModal}
+        title={`Workout: ${selectedDate}`}
+      >
+        {selectedWorkout ? (
+          <WorkoutDetails
+            workout={selectedWorkout}
+            isOpen={showModal}
+            onEditWorkout={openFormModalForEditing}
+            onClose={closeModal}
+            date={selectedDate}
+            onDelete={handleDeleteWorkout}
+          />
+        ) : (
+          <WorkoutForm closeModal={closeModal} date={selectedDate} />
+        )}
+      </Modal>
+      {isEditFormModalOpen && (
         <Modal
-          isOpen={showWorkoutForm}
-          onClose={closeModal}
-          title={selectedEvent ? "Edit Workout" : "Add Workout"}
+          isOpen={isEditFormModalOpen}
+          onClose={() => setIsEditFormModalOpen(false)}
         >
           <WorkoutForm
-            closeModal={closeModal}
+            closeModal={() => setIsEditFormModalOpen(false)}
             date={selectedDate}
-            workoutToEdit={selectedEvent?.resource}
-            isEditing={Boolean(selectedEvent)}
-            onUpdateWorkout={updateWorkout} // You should implement this function to update the event in the calendar
+            workoutToEdit={selectedWorkout}
+            isEditing={isEditing}
           />
-        </Modal>
-      )}
-      {showWorkoutDetails && (
-        <Modal
-          isOpen={showWorkoutDetails}
-          onClose={closeModal}
-          title="Workout Details"
-        >
-          <WorkoutDetails workout={selectedEvent?.resource} isOpen={showWorkoutDetails} onClose={closeModal}/>
         </Modal>
       )}
     </div>

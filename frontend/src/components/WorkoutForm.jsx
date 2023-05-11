@@ -214,7 +214,7 @@ const WorkoutForm = ({
       closeModal();
     }
   };
-  
+
   return (
     <Formik
       initialValues={{
