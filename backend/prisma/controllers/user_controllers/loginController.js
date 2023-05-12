@@ -39,7 +39,7 @@ const loginController = asyncHandler(async (req, res) => {
 res.cookie("token", token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-  maxAge: 60 * 60 * 1000, // 1 hour
+  maxAge: 60 * 60 * 10000, // 1 hour
   sameSite: "lax", // Prevent CSRF attacks
 });
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require('../middleware/authenticate')
-const { dashboardController, calendarController, personalBestsController } = require('../prisma/controllers/page_controllers/pageIndex')
+const { dashboardController, calendarController, personalBestsController,getExerciseSummary } = require('../prisma/controllers/page_controllers/pageIndex')
 const { createGoal, updateGoal, deleteGoal, getGoal, getGoals } = require('../prisma/controllers/goal_CRUD/goalCRUDIndex')
 const {
   createWorkout,
@@ -17,6 +17,8 @@ const {
 router.get("/", dashboardController)
 router.get("/calendar", calendarController)
 router.get("/personal-bests", personalBestsController)
+router.get("/getExerciseSummary", getExerciseSummary);
+
 
 //getting goals
 router.get("/goals", getGoals);

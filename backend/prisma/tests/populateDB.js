@@ -21,21 +21,55 @@ const EXERCISE_NAMES = [
   "Overhead Press",
   "Dumbbell Bench Press",
   "Dumbbell Row",
-  //... add the rest of the exercises
+  "Dumbbell Overhead Press",
+  "Dumbbell Curl",
+  "Dumbbell Tricep Extension",
+  "Lateral Raise",
+  "Dumbbell Rear Delt Fly",
+  "Dumbbell Shrug",
+  "Dumbbell Pullover",
+  "Dumbbell Skullcrusher",
+  "Skullcrusher",
+  "Hammer Curl",
+  "Dumbbell Fly",
+  "Dumbbell Incline Curl",
+  "Lat Pulldown",
+  "Cable Rows",
+  "EZ Bar Curls",
+  "Cable Tricep Extension",
+  "Chin-ups",
+  "Squat",
+  "Deadlift",
+  "Lunge",
+  "Leg Press",
+  "Leg Extension",
+  "Leg Curl",
+  "Calf Raise",
+  "Romanian Deadlift",
+  "Good Morning",
+  "Leg Extensions",
 ];
+
+GOALS = ["Eat pizza",
+  "Sleep",
+"Drink Water"]
 
 async function main() {
   // Create a user
-  const user = await prisma.users.create({
-    data: {
-      email: "youremail@example.com",
-      password: "yourpassword",
-    },
-  });
-
+  await prisma.subgoals.deleteMany();
+  await prisma.goals.deleteMany();
+  await prisma.exerciseSets.deleteMany();
+  await prisma.exercises.deleteMany();
+  await prisma.workouts.deleteMany();
+  
+ const user = await prisma.users.findUnique({
+   where: {
+     email: "test@email.com",
+   },
+ });
   // Generate workouts
   const startDate = moment("2022-01-01");
-  const endDate = moment("2023-05-05");
+  const endDate = moment("2023-06-05");
 
   for (
     let date = startDate;
@@ -86,7 +120,7 @@ async function main() {
   for (let i = 0; i < numGoals; i++) {
     const goal = await prisma.goals.create({
       data: {
-        title: faker.random.words(),
+        title: faker.helpers.arrayElement(GOALS),
         completed: faker.datatype.boolean(),
         userId: user.userId,
       },
@@ -96,7 +130,7 @@ async function main() {
     for (let j = 0; j < numSubgoals; j++) {
       await prisma.subgoals.create({
         data: {
-          description: faker.random.words(),
+          description: faker.helpers.arrayElement(GOALS),
           completed: faker.datatype.boolean(),
           goalId: goal.goalId,
         },

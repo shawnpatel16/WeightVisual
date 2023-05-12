@@ -45,7 +45,6 @@ const CalendarPage = () => {
       const data = response.data.workouts;
 
       const formattedWorkouts = data.map((workout) => {
-        console.log(workout.date)
         const dateComponents = workout.date.split(/[-T:.Z]/).map(Number);
         const startDate = new Date(
           Date.UTC(
