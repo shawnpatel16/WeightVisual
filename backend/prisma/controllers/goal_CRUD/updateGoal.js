@@ -3,7 +3,7 @@ const prisma = require("../../prismaClient");
 
 const updateGoal = asyncHandler(async (req, res) => {
   const updatedGoal = await prisma.goals.update({
-    where: { goalId: parseInt(req.params.goalId), userId: req.user.id },
+    where: { goalId: parseInt(req.params.id), userId: req.user.id },
     data: {
       title: req.body.title,
       completed: req.body.completed,

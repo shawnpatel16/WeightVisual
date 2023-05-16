@@ -7,6 +7,8 @@ const getExerciseSummary = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 20;
   const page = parseInt(req.query.page) || 1;
   const offset = limit * (page - 1);
+  
+  
 
   // Get exercises for the user with pagination
   const exercises = await prisma.exercises.findMany({
@@ -23,7 +25,7 @@ const getExerciseSummary = asyncHandler(async (req, res) => {
       .reduce((map, obj) => map.set(obj.exerciseName, obj), new Map())
       .values()
   );
-
+const totalPages = Math.ceil(uniqueExercises.length / 20);
   // Perform pagination
   const paginatedExercises = uniqueExercises.slice(offset, offset + limit);
   paginatedExercises.forEach((exercise) => {
@@ -59,8 +61,8 @@ const getExerciseSummary = asyncHandler(async (req, res) => {
       reps: summary[name].topSet.reps,
     },
   }));
-
-  res.json(exerciseSummaries);
+console.log(totalPages)
+  res.status(200).json({ exerciseSummaries, totalPages });
 });
 
 module.exports = getExerciseSummary;

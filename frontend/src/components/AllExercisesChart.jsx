@@ -80,9 +80,9 @@ const ExerciseChart = () => {
     fetchData();
   }, [timeframe, split]);
 
-const exerciseNames = new Set(
-  chartData.flatMap((data) => Object.keys(data)).filter((key) => key !== "date")
-);
+  const exerciseNames = new Set(
+    chartData.flatMap((data) => Object.keys(data)).filter((key) => key !== "date")
+  );
   return (
     <div>
       <div>
@@ -105,28 +105,32 @@ const exerciseNames = new Set(
           </button>
         ))}
       </div>
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart
-          data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {Array.from(exerciseNames).map((name) => (
-            <Line
-              key={name}
-              type="monotone"
-              dataKey={name}
-              stroke={`#${((Math.random() * 0xffffff) << 0).toString(16)}`}
-            />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+      {chartData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={500}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {Array.from(exerciseNames).map((name) => (
+              <Line
+                key={name}
+                type="monotone"
+                dataKey={name}
+                stroke={`#${((Math.random() * 0xffffff) << 0).toString(16)}`}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <p>No workouts recorded for the given settings.</p>
+      )}
     </div>
   );
-};
+}
 
 export default ExerciseChart;

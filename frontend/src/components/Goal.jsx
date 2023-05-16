@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-
-const SubGoal = ({ isCompleted, toggleCompletion }) => {
+import React, { useState, useEffect } from "react";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import axios from "axios";
+const SubGoal = ({ isCompleted, toggleCompletion, subgoal }) => {
+  console.log(isCompleted)
   return (
     <li
       onClick={toggleCompletion}
@@ -8,22 +10,33 @@ const SubGoal = ({ isCompleted, toggleCompletion }) => {
         isCompleted ? "line-through text-green-500" : "text-white"
       }`}
     >
-      Subgoal {isCompleted ? "(Completed)" : ""}
+      {subgoal.description} {isCompleted ? "(Completed)" : ""}
     </li>
   );
 };
 
-const Goal = ({ title, subgoals }) => {
+const Goal = ({ goalId, title, subgoals, onEdit, onDelete }) => {
   const [completedSubgoals, setCompletedSubgoals] = useState(
-    new Array(subgoals.length).fill(false)
+    subgoals.map((subgoal) => subgoal.completed)
   );
 
-  const toggleSubgoalCompletion = (index) => {
+  const toggleSubgoalCompletion = async (index) => {
     const newCompletedSubgoals = [...completedSubgoals];
     newCompletedSubgoals[index] = !newCompletedSubgoals[index];
     setCompletedSubgoals(newCompletedSubgoals);
-  };
-
+    console.log(goalId)
+    try {
+    await axios.put(`/api/workout/goals/${goalId}/subgoals/${subgoals[index].subgoalId}`, {
+      isCompleted: newCompletedSubgoals[index]
+    });
+  } catch (error) {
+    console.error("Error updating subgoal completion status", error);
+  }
+};
+  
+useEffect(() => {
+  setCompletedSubgoals(subgoals.map((subgoal) => subgoal.completed));
+}, [subgoals]);
   const progressPercentage =
     (completedSubgoals.filter((completed) => completed).length /
       completedSubgoals.length) *
@@ -31,13 +44,24 @@ const Goal = ({ title, subgoals }) => {
 
   return (
     <div className="bg-gray-700 p-4 rounded-lg mb-4">
-      <h3 className="text-white mb-2">{title}</h3>
+      <h3 className="text-white mb-2">
+        {title}
+        <button onClick={onEdit} className="text-blue-500 ml-2">
+          <FiEdit2 />
+        </button>
+        <button onClick={onDelete} className="text-red-500 ml-2">
+          <FiTrash2 />
+        </button>
+      </h3>
+
       <ul className="list-none space-y-1 mb-4">
         {subgoals.map((subgoal, index) => (
           <SubGoal
             key={index}
             isCompleted={completedSubgoals[index]}
             toggleCompletion={() => toggleSubgoalCompletion(index)}
+            subgoal={subgoal}
+            
           />
         ))}
       </ul>

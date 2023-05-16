@@ -1,5 +1,5 @@
 import React from 'react'
-import ExerciseChart from '../components/ExerciseProgressChart';
+import ExerciseChart from '../components/AllExercisesChart';
 import ExerciseTable from '../components/ExerciseTable';
 const PersonalBestsPage = () => {
   return (

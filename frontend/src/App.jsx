@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import "./App.css";
 import axios from "axios";
 import LoginHandler from "./LoginHandler";
+import ExercisePage from "./pages/ExercisePage";
 import "./index.css";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
@@ -190,6 +191,12 @@ const openFormModalForEditing = (workout) => {
                   path="goals"
                   element={<GoalsPage />}
                 />
+                <Route
+                  isLoggedIn={isLoggedIn}
+                  path="exercises/:exerciseName"
+                  element={<ExercisePage />}
+                />
+        
               </>
             )}
           </Routes>
