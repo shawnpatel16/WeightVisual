@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import { BsCheckCircle, BsXCircle } from "react-icons/bs"; // Import Icons
 
 const ConfirmationDialog = ({
   message,
@@ -28,9 +29,17 @@ const ConfirmationDialog = ({
     <>
       <div onClick={handleOpen}>{children}</div>
       <Modal isOpen={isOpen} onClose={handleClose}>
-        <h2>{message}</h2>
-        <button onClick={handleConfirm}>Yes</button>
-        <button onClick={handleClose}>No</button>
+        <h2 className="mb-4 text-center">{message}</h2> {/* Add margin bottom */}
+        <div className="flex justify-center space-x-4">
+          {" "}
+          {/* Center buttons and add spacing */}
+          <button className="text-green-500 text-2xl" onClick={handleConfirm}>
+            <BsCheckCircle /> {/* Check Mark Icon */}
+          </button>
+          <button className="text-red-500 text-2xl" onClick={handleClose}>
+            <BsXCircle /> {/* X Mark Icon */}
+          </button>
+        </div>
       </Modal>
     </>
   );

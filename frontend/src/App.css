@@ -1,0 +1,21 @@
+/* App.css */
+.pagination li {
+  display: inline-block;
+  margin-right: 10px; /* Space between page numbers */
+  cursor: pointer; /* Change the cursor when hovering over a page number */
+}
+
+.pagination li a {
+  color:#5865f2; /* Change this to the hex value of your text-secondary color */
+}
+
+.pagination li a:hover {
+  color: #e2e8f0; /* Change this to the color you want when hovering */
+}
+
+.pagination li.active a {
+  background-color:#5865f2; /* The background of the active page number */
+  border-radius: 50%; /* Makes the background a circle */
+  color: white; /* The color of the active page number */
+  padding: 5px 10px; /* Adjust as needed to fit the circle around the number */
+}

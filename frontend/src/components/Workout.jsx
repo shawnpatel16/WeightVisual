@@ -21,7 +21,7 @@ const { deleteWorkout, undoDeleteWorkout } = useContext(WorkoutContext);
 
 
   return (
-    <tr>
+    <tr className="hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out p-2">
       <td className="" onClick={onClick}>
         {formattedDate}
       </td>
@@ -29,15 +29,15 @@ const { deleteWorkout, undoDeleteWorkout } = useContext(WorkoutContext);
         {relativeTime}
       </td>
       <td className="" onClick={onClick}>
-        {item.progressMade ? <FaCheck /> : <FaTimes />}
+        {item.workoutProgressMade ? <FaCheck /> : <FaTimes />}
       </td>
       <td className="" onClick={onClick}>
         {item.split}
       </td>
-      <td data-testid="edit-button" className="">
+      <td data-testid="edit-button" className="px-2">
         <MdEdit onClick={(event) => handleEditClick(event, item)} />
       </td>
-      <td data-testid="delete-button" className="">
+      <td data-testid="delete-button" className="px-2">
         <ConfirmationDialog
           isDeleteDialogOpen={false} // Pass the initial open state as a prop
           message="Are you sure you want to delete this workout?"

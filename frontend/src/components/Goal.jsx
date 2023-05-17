@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import axios from "axios";
 const SubGoal = ({ isCompleted, toggleCompletion, subgoal }) => {
-  console.log(isCompleted)
+
   return (
     <li
       onClick={toggleCompletion}
@@ -16,8 +16,9 @@ const SubGoal = ({ isCompleted, toggleCompletion, subgoal }) => {
 };
 
 const Goal = ({ goalId, title, subgoals, onEdit, onDelete }) => {
+  console.log(subgoals)
   const [completedSubgoals, setCompletedSubgoals] = useState(
-    subgoals.map((subgoal) => subgoal.completed)
+    (subgoals || []).map((subgoal) => subgoal.completed)
   );
 
   const toggleSubgoalCompletion = async (index) => {
@@ -35,7 +36,7 @@ const Goal = ({ goalId, title, subgoals, onEdit, onDelete }) => {
 };
   
 useEffect(() => {
-  setCompletedSubgoals(subgoals.map((subgoal) => subgoal.completed));
+  setCompletedSubgoals((subgoals || []).map((subgoal) => subgoal.completed));
 }, [subgoals]);
   const progressPercentage =
     (completedSubgoals.filter((completed) => completed).length /
@@ -55,7 +56,7 @@ useEffect(() => {
       </h3>
 
       <ul className="list-none space-y-1 mb-4">
-        {subgoals.map((subgoal, index) => (
+        {subgoals && subgoals.map((subgoal, index) => (
           <SubGoal
             key={index}
             isCompleted={completedSubgoals[index]}

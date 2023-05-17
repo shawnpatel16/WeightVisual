@@ -2,12 +2,12 @@ import React, {useState,useEffect} from 'react'
 import axios
   from 'axios';
 const GoalsDashboardComponent = ({ className, mainGoals }) => {
-  const [goals,setGoals] = useState([])
+  const [goals, setGoals] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get("/api/workout/goals");
       const data = response.data;
-      setGoals(data.goals.slice(0, 3)); 
+      setGoals(data.goals.slice(0, 3));
     };
 
     fetchData();
@@ -16,11 +16,11 @@ const GoalsDashboardComponent = ({ className, mainGoals }) => {
     <div
       className={`bg-gray-700 rounded-xl shadow-md p-6 h-48 flex flex-col justify-between ${className}`}
     >
-      <h2 className="text-xl font-bold text-center text-secondary">
+      <h2 className="text-xl font-bold text-center text-slate">
         Current Goals
       </h2>
-      <div className="flex flex-grow items-center justify-center">
-        <span className="text-4xl font-semibold text-secondary">
+      <div className="flex flex-grow items-center justify-center overflow-auto">
+        <span className="text-2xl font-semibold text-secondary">
           <ul className="space-y-2">
             {mainGoals.map((goal, index) => (
               <li key={index} className="text-secondary">

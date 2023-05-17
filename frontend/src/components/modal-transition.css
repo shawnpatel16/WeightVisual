@@ -1,6 +1,6 @@
 .modal-enter {
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(0.8);
 }
 
 .modal-enter-active {
@@ -16,6 +16,6 @@
 
 .modal-exit-active {
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(0.8);
   transition: opacity 150ms, transform 150ms;
 }

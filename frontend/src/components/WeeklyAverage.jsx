@@ -8,7 +8,7 @@ const WeeklyAverage = ({weeklyAverage, className}) => {
     <div
       className={`bg-gray-700 rounded-xl shadow-md p-6 h-48 flex flex-col justify-between ${className}`}
     >
-      <h2 className="text-xl font-bold text-center text-secondary">
+      <h2 className="text-xl font-bold text-center text-slate">
         Weekly Average
       </h2>
       <div className="flex flex-grow items-center justify-center">

@@ -38,6 +38,8 @@ const handleAddGoal = async (values) => {
   const response = await axios.post("/api/workout/goals", values);
   console.log(response)
   setGoals((prevGoals) => [response.data.newGoal, ...prevGoals]);
+  setGoalChange(!goalChange);
+
   closeGoalsModal();
 };
 
@@ -85,7 +87,7 @@ const handleEditGoal = (goal) => {
     await axios.delete(`/api/workout/goals/${goal.goalId}`);
     setGoalChange(!goalChange);
   };
-
+  console.log(goals)
   return (
     <>
       <div className="pl-24">

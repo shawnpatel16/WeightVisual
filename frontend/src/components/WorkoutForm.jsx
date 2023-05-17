@@ -1,4 +1,5 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
+import ToggleSwitch from "./ToggleSwitch";
 import {
   Formik,
   Form,
@@ -160,21 +161,15 @@ const suggestedExercises = {
     "Dumbbell Shrug",
   ],
 };
-const WorkoutForm = ({
-  closeModal,
-  date,
-  workoutToEdit,
-  isEditing,
-}) => {
+const WorkoutForm = ({ closeModal, date, workoutToEdit, isEditing }) => {
   const { addWorkout, updateWorkout } = useContext(WorkoutContext);
   const [suggestions, setSuggestions] = useState([]);
   const getSuggestions = (value, split) => {
-    
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
-    
+
     const splitExercises = suggestedExercises[split] || [];
-    
+
     return inputLength === 0
       ? []
       : splitExercises.filter(
@@ -183,7 +178,6 @@ const WorkoutForm = ({
         );
   };
   const onSuggestionsFetchRequested = ({ value }, splitName) => {
-    
     setSuggestions(getSuggestions(value, splitName));
   };
 
@@ -196,14 +190,11 @@ const WorkoutForm = ({
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       if (isEditing) {
-        await updateWorkout(workoutToEdit.workoutId, values); 
+        await updateWorkout(workoutToEdit.workoutId, values);
       } else {
         await addWorkout(values);
       }
-      
-    
     } catch (error) {
-      
     } finally {
       setSubmitting(false);
       toast.success(
@@ -227,7 +218,7 @@ const WorkoutForm = ({
             }))
           : [],
         date: isEditing ? workoutToEdit.date : date,
-        
+
         workoutProgressMade: isEditing
           ? workoutToEdit.workoutProgressMade
           : false,
@@ -235,94 +226,103 @@ const WorkoutForm = ({
       onSubmit={handleSubmit}
     >
       {({ values, handleChange, setFieldValue }) => {
-        
+        const handleToggleChange = (index) => {
+          setFieldValue(
+            `exercises.${index}.exerciseProgressMade`,
+            !values.exercises[index].exerciseProgressMade
+          );
+        };
         return (
           <Form className="space-y-6 workout-form">
-            <div className="flex flex-wrap items-center space-x-4 split-name-wrapper">
-              <label htmlFor="split" className="text-lg split-name-label">
-                Split Name
-              </label>
-              <Field
-                as="select"
-                name="split"
-                className="rounded split-name-select"
-              >
-                <option value="">Select a split</option>
-                <option value="Upper Body">Upper Body</option>
-                <option value="Lower Body">Lower Body</option>
-                <option value="Push">Push</option>
-                <option value="Pull">Pull</option>
-                <option value="Legs">Legs</option>
-                <option value="Full Body">Full Body</option>
-                <option value="Chest/Back">Chest/Back</option>
-                <option value="Arms">Arms</option>
-                <option value="Legs/Shoulders">Legs/Shoulders</option>
-              </Field>
-            </div>
-            <label className="flex items-center">
-              <Field
-                type="checkbox"
+            <div className="flex items-center justify-start">
+              <div className="flex flex-wrap items-center space-x-3 split-name-wrapper mr-4">
+                <label htmlFor="split" className="split-name-label">
+                  Split Name
+                </label>
+                <Field
+                  as="select"
+                  name="split"
+                  className="rounded split-name-select pr-10 w-45"
+                >
+                  <option value="">Select a split</option>
+                  <option value="Upper Body">Upper Body</option>
+                  <option value="Lower Body">Lower Body</option>
+                  <option value="Push">Push</option>
+                  <option value="Pull">Pull</option>
+                  <option value="Legs">Legs</option>
+                  <option value="Full Body">Full Body</option>
+                  <option value="Chest/Back">Chest/Back</option>
+                  <option value="Arms">Arms</option>
+                  <option value="Legs/Shoulders">Legs/Shoulders</option>
+                </Field>
+              </div>
+              <ToggleSwitch
                 name="workoutProgressMade"
-                className="form-checkbox"
+                checked={values.workoutProgressMade}
+                onChange={handleChange}
               />
-              <span className="ml-2">Progress Made</span>
-            </label>
+            </div>
 
             <FieldArray name="exercises">
               {({ remove, push }) => (
                 <>
                   {values.exercises.map((exercise, index) => (
-                    <div key={index} className="space-y-4  exercise-wrapper">
-                      <div className="flex items-center space-x-4  exercise-row">
-                        <label
-                          className="exercise-name-label"
-                          htmlFor={`exercises.${index}.exerciseName`}
-                        >
-                          Exercise {index + 1}
-                        </label>
-                        <Autosuggest
-                          suggestions={suggestions}
-                          theme={{ container: "autosuggest-container" }}
-                          onSuggestionsFetchRequested={({ value }) =>
-                            onSuggestionsFetchRequested({ value }, values.split)
-                          }
-                          onSuggestionsClearRequested={
-                            onSuggestionsClearRequested
-                          }
-                          getSuggestionValue={getSuggestionValue}
-                          renderSuggestion={(suggestion) => (
-                            <div className="suggestion-item">{suggestion}</div>
-                          )}
-                          inputProps={{
-                            type: "text",
-                            name: `exercises.${index}.exerciseName`,
-                            value: exercise.exerciseName || "",
-                            onChange: (event, { newValue }) => {
-                              setFieldValue(
-                                `exercises.${index}.exerciseName`,
-                                newValue
-                              );
-                            },
-                            className: "h-6 exercise-input",
-                          }}
-                        />
-                        <label className="flex items-center">
-                          <Field
-                            type="checkbox"
-                            name={`exercises.${index}.exerciseProgressMade`}
-                            className="form-checkbox"
+                    <div key={index} className="flex exercise-wrapper">
+                      <div className="space-y-4 flex-grow">
+                        <div className="flex items-center space-x-4 exercise-row">
+                          <label
+                            className="exercise-name-label text-secondary"
+                            htmlFor={`exercises.${index}.exerciseName`}
+                          >
+                            Exercise {index + 1}
+                          </label>
+                          <Autosuggest
+                            suggestions={suggestions}
+                            theme={{ container: "autosuggest-container" }}
+                            onSuggestionsFetchRequested={({ value }) =>
+                              onSuggestionsFetchRequested(
+                                { value },
+                                values.split
+                              )
+                            }
+                            onSuggestionsClearRequested={
+                              onSuggestionsClearRequested
+                            }
+                            getSuggestionValue={getSuggestionValue}
+                            renderSuggestion={(suggestion) => (
+                              <div className="suggestion-item">
+                                {suggestion}
+                              </div>
+                            )}
+                            inputProps={{
+                              type: "text",
+                              name: `exercises.${index}.exerciseName`,
+                              value: exercise.exerciseName || "",
+                              onChange: (event, { newValue }) => {
+                                setFieldValue(
+                                  `exercises.${index}.exerciseName`,
+                                  newValue
+                                );
+                              },
+                              className: "h-6 exercise-input",
+                            }}
                           />
-                          <span className="ml-2">Progress Made</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => remove(index)}
-                          className="text-red-600  delete-exercise-btn"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </div>
-                      <div className="ml-4">
+                          <ToggleSwitch
+                            name={`exercises.${index}.exerciseProgressMade`}
+                            checked={
+                              values.exercises[index].exerciseProgressMade
+                            }
+                            onChange={() => handleToggleChange(index)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => remove(index)}
+                            className="ml-auto text-red-600 delete-exercise-btn pl-3"
+                          >
+                            <FiTrash2 size="16" />
+                          </button>
+                        </div>
+
                         <FieldArray name={`exercises.${index}.exerciseSets`}>
                           {({ remove: removeSet, push: pushSet }) => (
                             <>
@@ -331,7 +331,8 @@ const WorkoutForm = ({
                                   key={setIndex}
                                   className="flex items-center space-x-4 set-wrapper"
                                 >
-                                  
+                                  {" "}
+                                  {/* Opening tag for set-wrapper div */}
                                   <span className="set-label">
                                     Set {setIndex + 1}
                                   </span>
@@ -370,8 +371,6 @@ const WorkoutForm = ({
                                   </button>
                                 </div>
                               ))}
-                             
-
                               <button
                                 type="button"
                                 onClick={() =>
@@ -391,7 +390,13 @@ const WorkoutForm = ({
                   <div className="flex items-center add-exercise-wrapper">
                     <button
                       type="button"
-                      onClick={() => push({ exerciseName: "", exerciseSets: [], exerciseProgressMade: false })}
+                      onClick={() =>
+                        push({
+                          exerciseName: "",
+                          exerciseSets: [],
+                          exerciseProgressMade: false,
+                        })
+                      }
                       className="add-exercise-btn"
                     >
                       <AiOutlinePlus />
@@ -400,6 +405,7 @@ const WorkoutForm = ({
                 </>
               )}
             </FieldArray>
+
             <button type="submit">Submit</button>
           </Form>
         );

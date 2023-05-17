@@ -23,7 +23,7 @@
   }
 
   .split-name-select {
-    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2;
+    @apply bg-gray-700 text-gray-300 border border-gray-600 focus:border-indigo-400 focus:outline-none rounded px-2 ml-2;
   }
 
   /* Exercise */

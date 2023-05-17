@@ -2,8 +2,15 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 @layer components {
+  body {
+  @apply bg-tertiary font-sans;
+}
   .sidebar-icon {
     @apply relative flex items-center justify-center
             h-12 w-12 mt-2 mb-2 mx-auto shadow-lg

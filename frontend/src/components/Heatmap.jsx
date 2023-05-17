@@ -11,7 +11,23 @@ const WorkoutHeatmap = ({ allWorkouts, className }) => {
   })
   
 
-  const [startDate, setStartDate] = useState(new Date("2023-04-01"));
+  
+const mostRecentWorkoutDate =
+  allWorkouts && allWorkouts.length > 0
+    ? allWorkouts.reduce((latest, workout) => {
+        const workoutDate = new Date(workout.date);
+        return workoutDate > latest ? workoutDate : latest;
+      }, new Date(0))
+    : new Date();
+  const calculateStartDate = (latestDate) => {
+    const startDate = new Date(latestDate);
+    startDate.setMonth(startDate.getMonth() - 3);
+    return startDate;
+  };
+
+  const [startDate, setStartDate] = useState(
+    calculateStartDate(mostRecentWorkoutDate)
+  );
 
   const handlePrevious = () => {
     const newStartDate = new Date(startDate);
@@ -28,10 +44,11 @@ const WorkoutHeatmap = ({ allWorkouts, className }) => {
   return (
     <div className={`bg-gray-700 rounded-xl shadow-md pt-2 p-2 ${className}`}>
       <div className="flex justify-around">
-        <button onClick={handlePrevious}>
+        <button onClick={handlePrevious} className="text-slate">
           <BsFillArrowLeftCircleFill size="24" />
         </button>
-        <button onClick={handleNext}>
+        <span className="text-slate text-l">Heatmap</span>
+        <button onClick={handleNext} className="text-slate">
           <BsFillArrowRightCircleFill size="24" />
         </button>
       </div>
@@ -59,9 +76,8 @@ const WorkoutHeatmap = ({ allWorkouts, className }) => {
           "Dec",
         ]}
         panelColors={{
-          0: "#EBEDF0",
+          0: "#e2e8f0",
           1: "#239A3B",
-          
         }}
         rectRender={(props, data) => {
           const dateComponents = data.date.split("/");
@@ -84,7 +100,6 @@ const WorkoutHeatmap = ({ allWorkouts, className }) => {
             <>
               <rect
                 {...props}
-                
                 data-tooltip-content={`Date: ${formattedDate}`}
                 data-tooltip-id="heatmap-tooltip"
               />

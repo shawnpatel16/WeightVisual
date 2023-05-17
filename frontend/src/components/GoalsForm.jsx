@@ -1,31 +1,51 @@
 import React from "react";
-import { Formik, Form, Field, FieldArray } from "formik";
+import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import { AiOutlinePlus } from "react-icons/ai";
-
+import * as Yup from "yup";
 const defaultInitialValues = {
   title: "",
   subgoals: [],
 };
+
 
 const GoalsForm = ({
   closeModal,
   initialValues = defaultInitialValues,
   onSubmit,
 }) => {
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().required("Goal Title is required"),
+    subgoals: Yup.array()
+      .of(
+        Yup.object().shape({
+          description: Yup.string().required("Subgoal is required"),
+        })
+      )
+      .min(1, "At least one subgoal is required"),
+  });
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      {({ values, handleChange, setFieldValue }) => {
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={validationSchema}
+    >
+      {({ values, handleChange, handleBlur, handleSubmit, isSubmitting }) => {
         return (
-          <Form className="space-y-6 goals-form">
+          <Form className="space-y-6 goals-form" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <label htmlFor="title" className="text-lg">
                 Enter a long term goal
               </label>
               <Field
                 name="title"
+                type="text"
                 className="w-full rounded long-term-goal-input"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.title}
               />
+              <ErrorMessage name="title" component="div" />
             </div>
 
             <h3 className="text-lg sub-header">
@@ -49,8 +69,15 @@ const GoalsForm = ({
                       <Field
                         name={`subgoals.${index}.description`}
                         className="w-full rounded step-input"
+                        type="text"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={subgoal.description}
                       />
-
+                      <ErrorMessage
+                        name={`subgoals.${index}.description`}
+                        component="div"
+                      />
                       <button
                         type="button"
                         onClick={() => remove(index)}
@@ -73,7 +100,9 @@ const GoalsForm = ({
                 </>
               )}
             </FieldArray>
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={isSubmitting}>
+              Submit
+            </button>
           </Form>
         );
       }}
