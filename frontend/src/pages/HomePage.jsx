@@ -34,7 +34,7 @@ const HomePage = () => {
 
   return (
     <div className="p-8 pl-24 flex flex-col">
-      <h1 className="text-4xl font-bold mb-8 text-slate">Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div className="col-span-1 lg:col-span-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-32">
@@ -53,7 +53,7 @@ const HomePage = () => {
       <h2 className="text-3xl font-semibold text-slate mt-10">
         Your Workout History
       </h2>
-      <div className="mt-2 bg-gray-800 rounded-xl shadow-md p-6 min-h-max flex-grow">
+      <div className="mt-2 bg-gray-700 rounded-xl shadow-md p-6 min-h-max flex-grow">
         <WorkoutHistory
           onDelete={deleteWorkout}
           onEditWorkout={editWorkout}

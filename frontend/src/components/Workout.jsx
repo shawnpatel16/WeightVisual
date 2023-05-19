@@ -21,7 +21,7 @@ const { deleteWorkout, undoDeleteWorkout } = useContext(WorkoutContext);
 
 
   return (
-    <tr className="hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out p-2">
+    <tr className="hover:bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out p-2">
       <td className="" onClick={onClick}>
         {formattedDate}
       </td>

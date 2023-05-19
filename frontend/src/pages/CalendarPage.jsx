@@ -133,7 +133,7 @@ const handleDeleteWorkout = (workoutId) => {
     setShowModal(false);
   };
   return (
-    <div className="flex justify-center align-center pt-8">
+    <div className="flex justify-center align-center pt-8 text-slate">
       <Calendar
         style={{ height: "90vh" }}
         localizer={localizer}
@@ -144,6 +144,7 @@ const handleDeleteWorkout = (workoutId) => {
         startAccessor="start"
         endAccessor="end"
         className="w-4/5"
+        views={["month"]}
       />
       <Modal
         isOpen={showModal}

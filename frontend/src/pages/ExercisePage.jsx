@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import {
   LineChart,
   Line,
@@ -36,11 +37,14 @@ const ExercisePage = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const response = await axios.get(`/api/workout/exercises/${exerciseName}`, {
-        params: {
-          timeframe,
-        },
-      });
+      const response = await axios.get(
+        `/api/workout/exercises/${exerciseName}`,
+        {
+          params: {
+            timeframe,
+          },
+        }
+      );
 
       setExerciseData(response.data.transformedData);
     }
@@ -48,13 +52,19 @@ const ExercisePage = () => {
   }, [timeframe, dataType, exerciseName]);
 
   return (
-    <div className="pl-24">
-      <div>
+    <div className="bg-gray-800 p-6 text-white pl-24">
+      <h1 className="text-4xl font-bold mb-8 text-slate">{exerciseName}</h1>
+      <div className="mb-4 space-x-2">
         {TimeframeOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => setTimeframe(option.value)}
             disabled={timeframe === option.value}
+            className={`py-2 px-4 rounded ${
+              timeframe === option.value
+                ? "bg-gray-700"
+                : "bg-blue-700 hover:bg-blue-600"
+            }`}
           >
             {option.label}
           </button>
@@ -64,6 +74,11 @@ const ExercisePage = () => {
             key={option.value}
             onClick={() => setDataType(option.value)}
             disabled={dataType === option.value}
+            className={`py-2 px-4 rounded ${
+              dataType === option.value
+                ? "bg-gray-700"
+                : "bg-blue-700 hover:bg-blue-600"
+            }`}
           >
             {option.label}
           </button>
@@ -77,36 +92,38 @@ const ExercisePage = () => {
           }))}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis
+            dataKey="date"
+            tickFormatter={(str) => format(new Date(str), "MM/dd/yy")}
+          />
           <YAxis />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey={dataType} stroke="#8884d8" />
         </LineChart>
       </ResponsiveContainer>
-      <table>
+      <table className="mt-8 w-full text-sm bg-gray-700 rounded-lg text-white">
         <thead>
-          <tr>
-            <th>Date</th>
-            <th>Weight</th>
-            <th>Volume</th>
-            <th>Progress Made</th>
+          <tr className="text-left text-secondary">
+            <th className="p-3 border-b border-gray-600">Date</th>
+            <th className="p-3 border-b border-gray-600">Weight</th>
+            <th className="p-3 border-b border-gray-600">Volume</th>
+            <th className="p-3 border-b border-gray-600">Progress Made</th>
           </tr>
         </thead>
         <tbody>
           {exerciseData.map((data, index) => (
-            <tr key={index}>
-              <td>{data.date}</td>
-              <td>{data.weight}</td>
-              <td>{data.volume}</td>
-              <td>{data.progressMade ? "Yes" : "No"}</td>
+            <tr key={index} className="border-b border-gray-600">
+              <td className="p-3">{format(new Date(data.date), "MM/dd/yy")}</td>
+              <td className="p-3">{data.weight}</td>
+              <td className="p-3">{data.volume}</td>
+              <td className="p-3">{data.progressMade ? "Yes" : "No"}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
-}
+};
 
-  export default ExercisePage
+export default ExercisePage;

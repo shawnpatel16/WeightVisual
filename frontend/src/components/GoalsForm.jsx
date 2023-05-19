@@ -40,7 +40,7 @@ const GoalsForm = ({
               <Field
                 name="title"
                 type="text"
-                className="w-full rounded long-term-goal-input"
+                className="w-full rounded long-term-goal-input bg-tertiary"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.title}
@@ -61,14 +61,14 @@ const GoalsForm = ({
                       className="flex items-center space-x-4 step-row"
                     >
                       <label
-                        className="step-label"
+                        className="step-label w-1/6"
                         htmlFor={`subgoals.${index}.description`}
                       >
                         Step {index + 1}
                       </label>
                       <Field
                         name={`subgoals.${index}.description`}
-                        className="w-full rounded step-input"
+                        className="w-full rounded step-input bg-tertiary"
                         type="text"
                         onChange={handleChange}
                         onBlur={handleBlur}

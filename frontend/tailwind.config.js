@@ -9,7 +9,7 @@ export default {
       colors: {
         primary: "#202225",
         secondary: "#5865f2",
-        tertiary: "#41434a",
+        tertiary: "#2F3136",
         slate: "#e2e8f0",
         gray: colors.neutral,
         gray: {
@@ -25,6 +25,22 @@ export default {
       },
       fontFamily: {
         sans: ["Roboto", "sans-serif"],
+      },
+      keyframes: {
+        float: {
+          "0%": { transform: "translate(0, 0)" },
+          "25%": { transform: "translate(10px, 10px)" },
+          "50%": { transform: "translate(0, 0)" },
+          "75%": { transform: "translate(-10px, -10px)" },
+          "100%": { transform: "translate(0, 0)" },
+        },
+      },
+      animation: {
+        float: "float 3s ease-in-out infinite",
+      },
+      transformOrigin: {
+        // Needed for 3D rotation
+        "500": "500",
       },
     },
   },

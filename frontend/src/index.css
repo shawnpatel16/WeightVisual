@@ -7,9 +7,77 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.rbc-off-range-bg {
+  background-color: #2e2e2e !important;
+}
+
+.rbc-today {
+  background-color: #5865f2 !important;
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+  padding-right: 14rem !important; 
+}
+
+.rbc-event-content, .rbc-day-slot .rbc-background-event .rbc-event-allday {
+  background-color: none !important; 
+}
+
+.rbc-event-content {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 100% !important;
+}
+.rbc-calendar {
+  background-color: #2F3136;
+  color: #ffffff;
+}
+
+.rbc-header {
+  background-color: #36393F;
+  color: #8E9297;
+}
+
+.rbc-today {
+  background-color: #202225;
+}
+
+.rbc-event {
+  background-color: #7289DA;
+  border-radius: 5px;
+  color: #ffffff;
+}
+
+/* .rbc-off-range {
+  background-color: #4A4C4E !important;
+} */
+
+.rbc-toolbar {
+  /* background-color: #36393F; */
+  color: #8E9297;
+}
+
+.rbc-btn-group button,
+.rbc-toolbar-label {
+  color: #ffffff !important;
+  
+}
+
+.rbc-btn-group button:hover {
+  background-color: #4A4C4E !important;
+}
+
+.rbc-day-bg:hover {
+  cursor: pointer;
+  background-color: #4A4C4E;
+}
+
+
 @layer components {
   body {
-  @apply bg-tertiary font-sans;
+  @apply  bg-tertiary text-slate font-sans;
 }
   .sidebar-icon {
     @apply relative flex items-center justify-center
@@ -26,6 +94,6 @@ input[type='number']::-webkit-outer-spin-button {
             text-white bg-gray-900
             text-xs font-bold
             transition-all duration-100 scale-0 origin-left
-            hidden group-hover:inline-block;
+            hidden group-hover:inline-block z-50;
   }
 }

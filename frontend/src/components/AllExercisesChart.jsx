@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import {
   LineChart,
   Line,
@@ -81,25 +82,37 @@ const ExerciseChart = () => {
   }, [timeframe, split]);
 
   const exerciseNames = new Set(
-    chartData.flatMap((data) => Object.keys(data)).filter((key) => key !== "date")
+    chartData
+      .flatMap((data) => Object.keys(data))
+      .filter((key) => key !== "date")
   );
   return (
-    <div>
-      <div>
+    <div className="bg-gray-800 p-6 text-white">
+      <div className="mb-4 space-x-2">
         {TimeframeOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => setTimeframe(option.value)}
             disabled={timeframe === option.value}
+            className={`py-2 px-4 rounded ${
+              timeframe === option.value
+                ? "bg-gray-700"
+                : "bg-blue-700 hover:bg-blue-600"
+            }`}
           >
             {option.label}
           </button>
         ))}
+      </div>
+      <div className="mb-4 space-x-2">
         {SplitOptions.map((option) => (
           <button
             key={option}
             onClick={() => setSplit(option)}
             disabled={split === option}
+            className={`py-2 px-4 rounded ${
+              split === option ? "bg-gray-700" : "bg-blue-700 hover:bg-blue-600"
+            }`}
           >
             {option}
           </button>
@@ -111,8 +124,11 @@ const ExerciseChart = () => {
             data={chartData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            {/* <CartesianGrid strokeDasharray="" grid={false} /> */}
+            <XAxis
+              dataKey="date"
+              tickFormatter={(str) => format(new Date(str), "MM/dd/yy")}
+            />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -127,10 +143,12 @@ const ExerciseChart = () => {
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <p>No workouts recorded for the given settings.</p>
+        <div className="h-96 bg-gray-700 flex items-center justify-center text-xl">
+          <p>No workouts recorded for the given settings.</p>
+        </div>
       )}
     </div>
   );
-}
+};
 
 export default ExerciseChart;

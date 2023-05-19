@@ -85,7 +85,7 @@ const WorkoutHistory = ({
 
   return (
     <div className="w-full py-1 min-h-full flex flex-col">
-      <table className="bg-gray-800 table-auto w-full text-secondary divide-y divide-gray-700 flex-grow">
+      <table className="table-auto w-full text-secondary divide-y flex-grow">
         <thead className="text-lg border-b border-gray-500">
           <tr className="text-left text-slate">
             <th className="w-1/4">

@@ -46,7 +46,7 @@ const LoginModal = ({ isOpen, onClose, login}) => {
               <Field
                 type="email"
                 name="email"
-                className="w-full rounded long-term-goal-input"
+                className="w-full rounded long-term-goal-input bg-tertiary pl-2"
               />
               <ErrorMessage name="email" component="div" />
             </div>
@@ -58,7 +58,7 @@ const LoginModal = ({ isOpen, onClose, login}) => {
               <Field
                 type="password"
                 name="password"
-                className="w-full rounded long-term-goal-input"
+                className="w-full rounded long-term-goal-input bg-tertiary pl-2"
               />
               <ErrorMessage name="password" component="div" />
             </div>
