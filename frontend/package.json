@@ -73,7 +73,9 @@
     "jsdom":"17.0.0",
     "sockjs":"0.3.21",
     "node-notifier":"8.0.2",
-    "yargs-parser":"20.2.9"
+    "yargs-parser":"20.2.9",
+    "react-dev-utils": "11.0.4",
+    "chownr": "2.0.0"
 
 
 
