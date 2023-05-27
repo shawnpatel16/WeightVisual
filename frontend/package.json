@@ -58,5 +58,24 @@
     "react-scripts": "^2.1.3",
     "react-test-renderer": "^18.2.0",
     "vite": "^4.2.0"
+  },
+  "resolutions":{
+    "minimist": "^1.2.6",
+    "loader-utils": "1.4.1",
+    "shell-quote": "1.7.3",
+    "immer": "9.0.6",
+    "json5": "1.0.2",
+    "node-forge": "1.3.0",
+    "tar": "6.1.11",
+    "merge": "2.1.1",
+    "ini":"2.0.0",
+    "serialize-javascript": "5.0.1",
+    "jsdom":"17.0.0",
+    "sockjs":"0.3.21",
+    "node-notifier":"8.0.2",
+    "yargs-parser":"20.2.9"
+
+
+
   }
 }
