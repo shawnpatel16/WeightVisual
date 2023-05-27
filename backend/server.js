@@ -21,10 +21,16 @@ app.use(passport.initialize());
 app.use(validationErrorHandler)
 app.use(cookieParser());
 // Your routes go here
+
 app.use('/workout', authenticate, workoutRoutes)
 app.use('/signin', userRoutes)
 app.use('/auth',authRoutes)
 
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({ message: err.message });
