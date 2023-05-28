@@ -1,9 +1,8 @@
 {
-  "name": "trenning-log-app",
-  "scripts": {
-    "heroku-postbuild": "cd backend && npm install && npm start && cd ../frontend && npm install && npm run build"
-  },
-  "engines": {
-    "node": "14.x"
-  }
+  "name": "trenning-log",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
 }
