@@ -12,7 +12,10 @@ const validationErrorHandler = require('./middleware/validationErrorHandler')
 const authenticate = require('./middleware/authenticate')
 const authRoutes = require("./routes/authRoutes");
 const cookieParser = require("cookie-parser");
+const path = require('path');
+const cors = require('cors');
 
+app.use(cors());
 //middlewares for parsing and logging requests
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

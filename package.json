@@ -1,8 +1,0 @@
-{
-  "name": "trenning-log",
-  "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ]
-}
