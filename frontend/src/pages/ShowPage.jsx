@@ -23,7 +23,7 @@ const ShowPage = ({ onUserLogin }) => {
     return output;
   };
   const quoteText =
-    "Everybody wants to be a bodybuilder, but nobody wants to lift no heavy-ass weights.";
+    "Everybody wants to be a bodybuilder, but nobody wants to lift no heavy weights.";
   const typedText = useTypewriter(quoteText, 50);
 
   const openRegisterModal = () => {
